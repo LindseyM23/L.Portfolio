@@ -1,0 +1,40 @@
+<div class="home-container">
+  <header class="header">
+    <h1>Lindsey's Portfolio</h1>
+    <p class="subtitle">Full-Stack Developer</p>
+  </header>
+
+  <main class="main-content">
+    <section class="welcome-section">
+      <div *ngIf="loading" class="loading">Loading...</div>
+      <div *ngIf="!loading" class="message">
+        <h2>{{ message }}</h2>
+      </div>
+    </section>
+
+    <section class="info-section">
+      <div class="info-card">
+        <h3>About</h3>
+        <p>Welcome to my portfolio website built with Angular and Python.</p>
+      </div>
+
+      <div class="info-card">
+        <h3>Technologies</h3>
+        <ul>
+          <li>Frontend: Angular 17</li>
+          <li>Backend: Python Flask</li>
+          <li>Styling: SCSS</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>Contact</h3>
+        <p>Get in touch to discuss your next project!</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 Lindsey's Portfolio. All rights reserved.</p>
+  </footer>
+</div>
