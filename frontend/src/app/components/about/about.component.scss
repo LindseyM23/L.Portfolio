@@ -1,0 +1,197 @@
+@import '../../../theme.scss';
+
+.about-section {
+  @include section-container;
+  padding: $spacing-xxl 0;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: $spacing-xxl;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-xxl;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.overview {
+  position: relative;
+  line-height: 1.8;
+  font-size: 1.1rem;
+
+  .edit-btn {
+    margin-top: $spacing-md;
+    font-size: 14px;
+  }
+}
+
+.edit-form {
+  textarea {
+    width: 100%;
+    padding: $spacing-md;
+    border: $border-width solid $border-color;
+    border-radius: $border-radius;
+    font-family: $font-family;
+    font-size: 1rem;
+    resize: vertical;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+  }
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: $spacing-md;
+}
+
+.skill-badge {
+  position: relative;
+  background: $button-bg;
+  color: $button-text;
+  padding: $spacing-md;
+  border-radius: $border-radius;
+  text-align: center;
+  font-weight: $font-weight-bold;
+  transition: all $transition-fast;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  .delete-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 12px;
+
+    &:hover {
+      background: #ff4444;
+    }
+  }
+}
+
+.add-skill-btn {
+  border: 2px dashed $border-color;
+  font-size: 14px;
+  cursor: pointer;
+  color: white;
+}
+
+.add-form {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+
+  input {
+    flex: 1;
+    padding: $spacing-sm;
+    border: $border-width solid $border-color;
+    border-radius: $border-radius;
+  }
+}
+
+.char-counter {
+  font-size: 12px;
+  color: $text-secondary;
+  text-align: right;
+  margin-top: 4px;
+}
+
+.add-skill-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+  border: $border-width solid $border-color;
+  border-radius: $border-radius;
+
+  > input {
+    padding: $spacing-sm;
+    border: $border-width solid $border-color;
+    border-radius: $border-radius;
+    font-family: $font-family;
+    font-size: $font-size-base;
+  }
+
+  .icon-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+
+    label {
+      font-size: 14px;
+      color: $text-secondary;
+    }
+
+    .icon-options {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+    }
+
+    .upload-icon-btn {
+      padding: $spacing-sm $spacing-md;
+      background: $button-bg;
+      color: $button-text;
+      border: $border-width solid $border-color;
+      border-radius: $border-radius;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    .icon-preview {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      padding: $spacing-sm;
+      border: $border-width solid $border-color;
+      border-radius: $border-radius;
+      background: #f5f5f5;
+
+      .clear-icon {
+        background: black;
+        color: white;
+        border: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 12px;
+
+        &:hover {
+          background: #ff4444;
+        }
+      }
+    }
+  }
+
+  .btn-group {
+    display: flex;
+    gap: $spacing-sm;
+  }
+}

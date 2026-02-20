@@ -1,0 +1,191 @@
+@import '../../../theme.scss';
+
+.hero {
+  padding: $spacing-xxl 0;
+  min-height: 60vh;
+  @include flex-center;
+}
+
+.hero-container {
+  @include section-container;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-xxl;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+.hero-left {
+  h1 {
+    font-size: 4rem;
+    margin-bottom: $spacing-sm;
+    
+    @media (max-width: 768px) {
+      font-size: 3rem;
+    }
+  }
+
+  .tagline {
+    font-size: 1.5rem;
+    color: $text-secondary;
+    margin-bottom: $spacing-xl;
+    min-height: 2.5rem; // Prevent layout shift
+    
+    .cursor {
+      display: inline-block;
+      margin-left: 2px;
+      animation: blink 1s infinite;
+    }
+  }
+  
+  @keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+}
+
+.social-links {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-xl;
+
+  @media (max-width: 768px) {
+    align-items: center;
+  }
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border: $border-width solid $border-color;
+  border-radius: $border-radius;
+  transition: all $transition-fast;
+  position: relative;
+  width: fit-content;
+
+  .social-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: block;
+  }
+
+  &:hover {
+    transform: translateX(10px);
+    border-color: $accent-color;
+  }
+
+  .delete-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: black;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+
+    &:hover {
+      background: #ff4444;
+      color: white;
+    }
+  }
+}
+
+.add-btn {
+
+  border: 2px dashed $border-color;
+  max-width: 300px;
+  font-size: 16px;
+  cursor: pointer;
+
+}
+
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  max-width: 300px;
+
+  input {
+    padding: $spacing-md;
+    border: $border-width solid $border-color;
+    border-radius: $border-radius;
+    font-family: $font-family;
+  }
+
+  button {
+    padding: $spacing-sm $spacing-md;
+  }
+}
+
+.hero-right {
+  @include flex-center;
+}
+
+.profile-image-container {
+  position: relative;
+  width: 400px;
+  height: 400px;
+
+  @media (max-width: 768px) {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: $border-radius;
+  box-shadow: $card-shadow-hover;
+}
+
+.profile-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f5f5f5;
+  border-radius: $border-radius;
+  @include flex-center;
+  flex-direction: column;
+
+  .placeholder-icon {
+    width: 100px;
+    height: 100px;
+    opacity: 0.3;
+  }
+
+  p {
+    color: $text-secondary;
+    margin-top: $spacing-md;
+  }
+}
+
+.image-upload {
+  position: absolute;
+  bottom: $spacing-md;
+  left: 50%;
+  transform: translateX(-50%);
+
+  button {
+    font-size: 14px;
+    padding: $spacing-sm $spacing-md;
+  }
+}

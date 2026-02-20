@@ -1,0 +1,29 @@
+<div class="admin-login-container">
+  <div class="login-card">
+    <h1>Admin Access</h1>
+    <p class="subtitle">Enter password to unlock edit mode</p>
+
+    <form (ngSubmit)="login()">
+      <div class="form-group">
+        <input
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Enter admin password"
+          [disabled]="loading"
+          autocomplete="current-password"
+        />
+      </div>
+
+      <div class="error" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Logging in...' : 'Enter Admin Mode' }}
+      </button>
+    </form>
+
+    <a routerLink="/" class="back-link">← Back to Portfolio</a>
+  </div>
+</div>

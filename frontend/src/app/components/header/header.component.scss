@@ -1,0 +1,85 @@
+@import '../../../theme.scss';
+
+.header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: $header-height;
+  background: $bg-primary;
+  border-bottom: $border-width solid transparent;
+  transition: all $transition-normal;
+  z-index: $z-header;
+
+  &.scrolled {
+    border-bottom-color: $border-color;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.header-container {
+  max-width: $max-width-content;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  cursor: pointer;
+  
+  h2 {
+    font-weight: $font-weight-bold;
+    margin: 0;
+  }
+}
+
+.nav {
+  display: flex;
+  gap: $spacing-lg;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.nav-link {
+  cursor: pointer;
+  font-weight: $font-weight-normal;
+  transition: all $transition-fast;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.header-actions {
+  .admin-link {
+    font-size: 14px;
+    padding: $spacing-xs $spacing-md;
+    border: $border-width solid $border-color;
+    border-radius: $border-radius;
+    transition: all $transition-fast;
+    
+    &:hover {
+      background: $button-bg;
+      color: $button-text;
+      border-color: $button-bg;
+    }
+  }
+
+  .logout-btn {
+    font-size: 14px;
+    padding: $spacing-xs $spacing-md;
+    background: transparent;
+    color: $text-primary;
+    border: $border-width solid $border-color;
+    
+    &:hover {
+      background: $button-bg;
+      color: $button-text;
+      border-color: $button-bg;
+    }
+  }
+}

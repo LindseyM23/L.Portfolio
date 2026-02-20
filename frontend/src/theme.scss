@@ -1,0 +1,129 @@
+// ========================================
+// CENTRALIZED DESIGN SYSTEM
+// All styling must use these variables
+// ========================================
+
+// ========== COLORS ==========
+$bg-primary: #FFFFFF;
+$text-primary: #000000;
+$text-secondary: #666666;
+$button-bg: #000000;
+$button-text: #FFFFFF;
+$border-color: #E0E0E0;
+$accent-color: #000000;
+
+// ========== TYPOGRAPHY ==========
+$font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+$font-size-base: 16px;
+$font-size-h1: 3rem;
+$font-size-h2: 2rem;
+$font-size-h3: 1.5rem;
+$font-weight-normal: 400;
+$font-weight-bold: 600;
+
+// ========== SPACING ==========
+$spacing-xs: 0.5rem;
+$spacing-sm: 1rem;
+$spacing-md: 1.5rem;
+$spacing-lg: 2rem;
+$spacing-xl: 3rem;
+$spacing-xxl: 4rem;
+
+// ========== BORDERS & RADIUS ==========
+$border-radius: 28px;
+$border-width: 1px;
+
+// ========== BUTTONS ==========
+$button-padding: 10px 32px;
+$button-border-radius: $border-radius;
+$button-font-weight: $font-weight-bold;
+
+// ========== CARDS ==========
+$card-bg: $bg-primary;
+$card-padding: $spacing-lg;
+$card-border-radius: $border-radius;
+$card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+$card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+// ========== LAYOUT ==========
+$header-height: 70px;
+$max-width-content: 1200px;
+$section-padding: $spacing-xxl 0;
+
+// ========== TRANSITIONS ==========
+$transition-fast: 0.2s ease;
+$transition-normal: 0.3s ease;
+$transition-slow: 0.5s ease;
+
+// ========== Z-INDEX ==========
+$z-header: 1000;
+$z-modal: 2000;
+$z-tooltip: 3000;
+
+// ========================================
+// MIXINS
+// ========================================
+
+@mixin button-base {
+  padding: $button-padding;
+  border-radius: $button-border-radius;
+  font-weight: $button-font-weight;
+  background: $button-bg;
+  color: $button-text;
+  border: none;
+  cursor: pointer;
+  transition: all $transition-fast;
+  font-family: $font-family;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@mixin card-base {
+  background: $card-bg;
+  padding: $card-padding;
+  border-radius: $card-border-radius;
+  box-shadow: $card-shadow;
+  transition: all $transition-normal;
+  
+  &:hover {
+    box-shadow: $card-shadow-hover;
+  }
+}
+
+@mixin section-container {
+  max-width: $max-width-content;
+  margin: 0 auto;
+  padding: $section-padding $spacing-lg;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin responsive-grid($columns: 3, $gap: $spacing-lg) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}

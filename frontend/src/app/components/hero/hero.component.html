@@ -1,0 +1,64 @@
+<section class="hero">
+  <div class="hero-container">
+    <div class="hero-left">
+      <h1>Lindsey Monyepao</h1>
+      <p class="tagline">{{ typedText }}<span class="cursor">|</span></p>
+      
+      <div class="social-links">
+        <a *ngFor="let link of socialLinks" 
+           [href]="link.url" 
+           target="_blank" 
+           class="social-link"
+           [title]="link.platform">
+          <img [src]="getPlatformIcon(link.platform)" 
+               [alt]="link.platform + ' icon'" 
+               class="social-icon"
+               (error)="onImageError($event)" />
+          
+          <button *ngIf="isAdmin" 
+                  class="delete-btn" 
+                  (click)="deleteLink(link.id!); $event.preventDefault()">
+            ✕
+          </button>
+        </a>
+
+        <button *ngIf="isAdmin && !addingLink" 
+                (click)="addingLink = true" 
+                class="add-btn">
+          + Add Social Link
+        </button>
+      </div>
+
+      <div *ngIf="isAdmin && addingLink" class="add-form">
+        <input [(ngModel)]="newLink.platform" placeholder="Platform (e.g., GitHub)" />
+        <input [(ngModel)]="newLink.url" placeholder="URL" />
+        <button (click)="addLink()">Save</button>
+        <button (click)="addingLink = false">Cancel</button>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="profile-image-container">
+        <img *ngIf="about.profile_image" 
+             [src]="about.profile_image" 
+             alt="Profile" 
+             class="profile-image" />
+        <div *ngIf="!about.profile_image" class="profile-placeholder">
+          <img src="/assets/icons/camera.svg" alt="Camera icon" class="placeholder-icon" />
+          <p>No photo</p>
+        </div>
+
+        <div *ngIf="isAdmin" class="image-upload">
+          <input type="file" 
+                 #fileInput 
+                 (change)="onImageUpload($event)" 
+                 accept="image/*" 
+                 style="display: none;" />
+          <button (click)="fileInput.click()" [disabled]="uploadingImage">
+            {{ uploadingImage ? 'Uploading...' : 'Change Photo' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

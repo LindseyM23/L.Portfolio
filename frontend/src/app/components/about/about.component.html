@@ -1,0 +1,67 @@
+<section class="about-section">
+  <div class="container">
+    <h2 class="section-title">About Me</h2>
+
+    <div class="about-grid">
+      <div class="about-left">
+        <div class="overview" *ngIf="!editingAbout">
+          <p>{{ about.overview || 'No overview yet.' }}</p>
+          <button *ngIf="isAdmin" (click)="editingAbout = true" class="edit-btn">
+            <img src="/assets/icons/edit.svg" alt="Edit" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px; filter: brightness(0) invert(1);" />
+            Edit
+          </button>
+        </div>
+
+        <div *ngIf="editingAbout" class="edit-form">
+          <textarea [(ngModel)]="about.overview" rows="8" maxlength="500"></textarea>
+          <div class="char-counter">{{ about.overview.length || 0 }}/500 characters</div>
+          <div class="btn-group">
+            <button (click)="saveAbout()">Save</button>
+            <button (click)="editingAbout = false">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-right">
+        <div class="skills-grid">
+          <div *ngFor="let skill of skills" class="skill-badge">
+            {{ skill.name }}
+            <button *ngIf="isAdmin" class="delete-badge" (click)="deleteSkill(skill.id!)">✕</button>
+          </div>
+
+          <button *ngIf="isAdmin && !addingSkill" class="add-skill-btn" (click)="addingSkill = true">
+            + Add Skill
+          </button>
+        </div>
+
+        <div *ngIf="addingSkill" class="add-skill-form">
+          <input [(ngModel)]="newSkill.name" placeholder="Skill name" />
+          
+          <div class="icon-input-group">
+            <label>Icon (optional):</label>
+            <div class="icon-options">
+              <input type="file" 
+                     #skillIconInput 
+                     (change)="onSkillIconUpload($event)" 
+                     accept=".svg" 
+                     style="display: none;" />
+              <button type="button" (click)="skillIconInput.click()" class="upload-icon-btn">
+                <img src="/assets/icons/camera.svg" alt="Upload" style="width: 16px; height: 16px; filter: brightness(0) invert(1);" />
+                Upload SVG
+              </button>
+              <span *ngIf="skillIconPreview" class="icon-preview">
+                <img [src]="skillIconPreview" alt="Preview" style="width: 24px; height: 24px;" />
+                <button type="button" (click)="clearSkillIcon()" class="clear-icon">✕</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button (click)="addSkill()">Add</button>
+            <button (click)="cancelAddSkill()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

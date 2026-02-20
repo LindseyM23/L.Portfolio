@@ -1,0 +1,18 @@
+<header class="header" [class.scrolled]="isScrolled">
+  <div class="header-container">
+    <div class="logo" (click)="scrollTo('hero')">
+      <img src="../../../assets/icons/letter-l.svg" width="40px" alt="Logo">
+    </div>
+
+    <nav class="nav">
+      <a *ngFor="let link of navLinks" (click)="scrollTo(link.target)" class="nav-link">
+        {{ link.label }}
+      </a>
+    </nav>
+
+    <div class="header-actions">
+      <a *ngIf="!isAdmin" routerLink="/admin" class="admin-link">Admin</a>
+      <button *ngIf="isAdmin" (click)="logout()" class="logout-btn">Logout</button>
+    </div>
+  </div>
+</header>

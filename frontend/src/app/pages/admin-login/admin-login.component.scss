@@ -1,0 +1,69 @@
+@import '../../../theme.scss';
+
+.admin-login-container {
+  @include flex-center;
+  min-height: 100vh;
+  background: $bg-primary;
+}
+
+.login-card {
+  @include card-base;
+  max-width: 500px;
+  width: 100%;
+  margin: $spacing-lg;
+  text-align: center;
+
+  h1 {
+    margin-bottom: $spacing-sm;
+  }
+
+  .subtitle {
+    color: $text-secondary;
+    margin-bottom: $spacing-xl;
+  }
+
+  .form-group {
+    margin-bottom: $spacing-lg;
+
+    input {
+      width: 100%;
+      padding: $spacing-md;
+      border: $border-width solid $border-color;
+      border-radius: $border-radius;
+      font-size: $font-size-base;
+      font-family: $font-family;
+      transition: border-color $transition-fast;
+
+      &:focus {
+        outline: none;
+        border-color: $accent-color;
+      }
+
+      &:disabled {
+        background: #f5f5f5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .error {
+    color: #d32f2f;
+    margin-bottom: $spacing-md;
+    font-size: 14px;
+  }
+
+  button {
+    width: 100%;
+    margin-bottom: $spacing-lg;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: $text-secondary;
+    font-size: 14px;
+
+    &:hover {
+      color: $text-primary;
+    }
+  }
+}

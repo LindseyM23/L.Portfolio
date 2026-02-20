@@ -1,4 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global Styles - Using Centralized Theme */
+@import 'theme.scss';
+
 * {
   margin: 0;
   padding: 0;
@@ -6,11 +8,78 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: $font-family;
+  font-size: $font-size-base;
   line-height: 1.6;
-  color: #333;
+  color: $text-primary;
+  background: $bg-primary;
 }
 
 html, body {
   height: 100%;
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+}
+
+h1 { font-size: $font-size-h1; }
+h2 { font-size: $font-size-h2; }
+h3 { font-size: $font-size-h3; }
+
+button {
+  @include button-base;
+}
+
+a {
+  color: $text-primary;
+  text-decoration: none;
+  transition: opacity $transition-fast;
+  
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+// Utility classes
+.container {
+  @include section-container;
+}
+
+.card {
+  @include card-base;
+}
+
+.flex-center {
+  @include flex-center;
+}
+
+// Admin mode styles
+.admin-edit-btn {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  @include button-base;
+  padding: $spacing-xs $spacing-sm;
+  font-size: 14px;
+  opacity: 0.8;
+  
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.admin-indicator {
+  position: fixed;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  background: $button-bg;
+  color: $button-text;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $border-radius;
+  font-size: 14px;
+  font-weight: $font-weight-bold;
+  z-index: $z-header + 1;
 }
