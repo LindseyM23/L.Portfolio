@@ -15,22 +15,38 @@ import { Project } from '../../models/portfolio.models';
         
         <div class="projects-grid">
           <div *ngFor="let project of projects" class="project-card">
-            <div class="project-image">
-              <img *ngIf="project.image" [src]="project.image" [alt]="project.name" />
-              <div *ngIf="!project.image" class="image-placeholder">📁</div>
-            </div>
-            
-            <div class="project-content">
-              <h3>{{ project.name }}</h3>
-              <p>{{ project.description }}</p>
-              
-              <div class="project-links">
-                <a *ngIf="project.live_url" [href]="project.live_url" target="_blank">🌐 Live</a>
-                <a *ngIf="project.github_url" [href]="project.github_url" target="_blank">💻 GitHub</a>
+            <div *ngIf="editingProject !== project.id">
+              <div class="project-image">
+                <img *ngIf="project.image" [src]="project.image" [alt]="project.name" />
+                <div *ngIf="!project.image" class="image-placeholder">📁</div>
               </div>
               
-              <div *ngIf="isAdmin" class="project-actions">
-                <button (click)="deleteProject(project.id!)">Delete</button>
+              <div class="project-content">
+                <h3>{{ project.name }}</h3>
+                <p>{{ project.description }}</p>
+                
+                <div class="project-links">
+                  <a *ngIf="project.live_url" [href]="project.live_url" target="_blank">🌐 Live</a>
+                  <a *ngIf="project.github_url" [href]="project.github_url" target="_blank">💻 GitHub</a>
+                </div>
+                
+                <div *ngIf="isAdmin" class="project-actions">
+                  <button (click)="startEditProject(project)">Edit</button>
+                  <button (click)="deleteProject(project.id!)">Delete</button>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="editingProject === project.id" class="edit-form-inline">
+              <h4>Edit Project</h4>
+              <input [(ngModel)]="editProjectData.name" placeholder="Project Name" />
+              <textarea [(ngModel)]="editProjectData.description" placeholder="Description" rows="4"></textarea>
+              <input [(ngModel)]="editProjectData.image" placeholder="Image URL" />
+              <input [(ngModel)]="editProjectData.live_url" placeholder="Live URL" />
+              <input [(ngModel)]="editProjectData.github_url" placeholder="GitHub URL" />
+              <div class="project-actions">
+                <button (click)="saveEditProject()">Save</button>
+                <button (click)="cancelEditProject()">Cancel</button>
               </div>
             </div>
           </div>
@@ -73,13 +89,18 @@ import { Project } from '../../models/portfolio.models';
     .add-project:hover { border-color: $accent-color; }
     .add-form { margin-top: $spacing-lg; max-width: 600px; margin: $spacing-xl auto; display: flex; flex-direction: column; gap: $spacing-sm; }
     .add-form input, .add-form textarea { padding: $spacing-md; border: $border-width solid $border-color; border-radius: $border-radius; font-family: $font-family; }
+    .edit-form-inline { padding: $spacing-lg; display: flex; flex-direction: column; gap: $spacing-sm; }
+    .edit-form-inline h4 { margin-bottom: $spacing-sm; }
+    .edit-form-inline input, .edit-form-inline textarea { padding: $spacing-sm; border: $border-width solid $border-color; border-radius: $border-radius; font-family: $font-family; }
   `]
 })
 export class ProjectsComponent implements OnInit {
   isAdmin = false;
   projects: Project[] = [];
   adding = false;
+  editingProject: number | null = null;
   newProject: Project = { name: '', description: '', order: 0 };
+  editProjectData: Project = { name: '', description: '', order: 0 };
 
   constructor(private portfolioService: PortfolioService) {}
 
@@ -102,6 +123,25 @@ export class ProjectsComponent implements OnInit {
   cancelAdd(): void {
     this.adding = false;
     this.newProject = { name: '', description: '', order: 0 };
+  }
+
+  startEditProject(project: Project): void {
+    this.editingProject = project.id!;
+    this.editProjectData = { ...project };
+  }
+
+  saveEditProject(): void {
+    if (this.editingProject && this.editProjectData.name.trim()) {
+      this.portfolioService.updateProject(this.editingProject, this.editProjectData).subscribe(() => {
+        this.loadProjects();
+        this.cancelEditProject();
+      });
+    }
+  }
+
+  cancelEditProject(): void {
+    this.editingProject = null;
+    this.editProjectData = { name: '', description: '', order: 0 };
   }
 
   deleteProject(id: number): void {

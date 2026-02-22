@@ -57,34 +57,86 @@
 
 .skill-badge {
   position: relative;
-  background: $button-bg;
-  color: $button-text;
-  padding: $spacing-md;
+  background: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
   border-radius: $border-radius;
   text-align: center;
   font-weight: $font-weight-bold;
   transition: all $transition-fast;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 
-  &:hover {
-    transform: translateY(-4px);
+  .skill-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
-  .delete-badge {
+  .skill-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .skill-actions {
     position: absolute;
     top: 4px;
     right: 4px;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
+    display: flex;
+    gap: 4px;
+  }
+
+  .edit-skill-btn,
+  .delete-badge {
+    background: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
     border: none;
     padding: 0;
     width: 20px;
     height: 20px;
     border-radius: 50%;
     font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 
     &:hover {
       background: #ff4444;
+      color: white;
     }
+  }
+
+  .edit-skill-inline {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+
+    input {
+      padding: $spacing-sm;
+      border: $border-width solid $border-color;
+      border-radius: $border-radius;
+    }
+
+    .skill-edit-actions {
+      display: flex;
+      gap: $spacing-xs;
+      justify-content: center;
+
+      button {
+        padding: $spacing-xs $spacing-sm;
+        font-size: 12px;
+      }
+    }
+  }
+
+  &:hover {
+    transform: translateY(-4px);
   }
 }
 
@@ -182,6 +234,11 @@
         border-radius: 50%;
         cursor: pointer;
         font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        line-height: 1;
 
         &:hover {
           background: #ff4444;

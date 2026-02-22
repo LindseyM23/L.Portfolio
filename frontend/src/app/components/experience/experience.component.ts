@@ -17,15 +17,31 @@ import { WorkExperience } from '../../models/portfolio.models';
         <div class="timeline">
           <div *ngFor="let exp of experiences; let i = index" class="timeline-item" [class.left]="i % 2 === 0" [class.right]="i % 2 !== 0">
             <div class="timeline-content card">
-              <h3>{{ exp.role }}</h3>
-              <h4>{{ exp.company }}</h4>
-              <p class="period">{{ formatDate(exp.start_date) }} - {{ exp.end_date ? formatDate(exp.end_date) : 'Present' }}</p>
-              <p class="summary">{{ exp.summary }}</p>
-              
-              <button class="learn-more-btn" (click)="viewDetails(exp.id!)">Learn More →</button>
-              
-              <div *ngIf="isAdmin" class="exp-actions">
-                <button (click)="deleteExp(exp.id!)">Delete</button>
+              <div *ngIf="editingExp !== exp.id">
+                <h3>{{ exp.role }}</h3>
+                <h4>{{ exp.company }}</h4>
+                <p class="period">{{ formatDate(exp.start_date) }} - {{ exp.end_date ? formatDate(exp.end_date) : 'Present' }}</p>
+                <p class="summary">{{ exp.summary }}</p>
+                
+                <button class="learn-more-btn" (click)="viewDetails(exp.id!)">Learn More →</button>
+                
+                <div *ngIf="isAdmin" class="exp-actions">
+                  <button (click)="startEditExp(exp)">Edit</button>
+                  <button (click)="deleteExp(exp.id!)">Delete</button>
+                </div>
+              </div>
+
+              <div *ngIf="editingExp === exp.id" class="edit-form-inline">
+                <h4>Edit Experience</h4>
+                <input [(ngModel)]="editExpData.company" placeholder="Company" />
+                <input [(ngModel)]="editExpData.role" placeholder="Role" />
+                <input [(ngModel)]="editExpData.start_date" type="date" />
+                <input [(ngModel)]="editExpData.end_date" type="date" placeholder="End Date (leave empty if current)" />
+                <textarea [(ngModel)]="editExpData.summary" placeholder="Summary" rows="4"></textarea>
+                <div class="exp-actions">
+                  <button (click)="saveEditExp()">Save</button>
+                  <button (click)="cancelEditExp()">Cancel</button>
+                </div>
               </div>
             </div>
           </div>
@@ -67,6 +83,9 @@ import { WorkExperience } from '../../models/portfolio.models';
     .add-experience { text-align: center; margin-top: $spacing-xl; }
     .add-form { max-width: 600px; margin: $spacing-xl auto; display: flex; flex-direction: column; gap: $spacing-sm; }
     .add-form input, .add-form textarea { padding: $spacing-md; border: $border-width solid $border-color; border-radius: $border-radius; font-family: $font-family; }
+    .edit-form-inline { display: flex; flex-direction: column; gap: $spacing-sm; }
+    .edit-form-inline h4 { margin-bottom: $spacing-sm; }
+    .edit-form-inline input, .edit-form-inline textarea { padding: $spacing-sm; border: $border-width solid $border-color; border-radius: $border-radius; font-family: $font-family; }
     @media (max-width: 768px) { 
       .timeline::before { left: 20px; }
       .timeline-item.left .timeline-content, .timeline-item.right .timeline-content { margin-left: 40px; margin-right: 0; }
@@ -77,7 +96,9 @@ export class ExperienceComponent implements OnInit {
   isAdmin = false;
   experiences: WorkExperience[] = [];
   adding = false;
+  editingExp: number | null = null;
   newExp: WorkExperience = { company: '', role: '', start_date: '', order: 0 };
+  editExpData: WorkExperience = { company: '', role: '', start_date: '', order: 0 };
 
   constructor(
     private portfolioService: PortfolioService,
@@ -111,6 +132,25 @@ export class ExperienceComponent implements OnInit {
   cancelAdd(): void {
     this.adding = false;
     this.newExp = { company: '', role: '', start_date: '', order: 0 };
+  }
+
+  startEditExp(exp: WorkExperience): void {
+    this.editingExp = exp.id!;
+    this.editExpData = { ...exp };
+  }
+
+  saveEditExp(): void {
+    if (this.editingExp && this.editExpData.company.trim() && this.editExpData.role.trim()) {
+      this.portfolioService.updateExperience(this.editingExp, this.editExpData).subscribe(() => {
+        this.loadExperiences();
+        this.cancelEditExp();
+      });
+    }
+  }
+
+  cancelEditExp(): void {
+    this.editingExp = null;
+    this.editExpData = { company: '', role: '', start_date: '', order: 0 };
   }
 
   deleteExp(id: number): void {

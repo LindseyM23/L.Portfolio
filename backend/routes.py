@@ -110,13 +110,18 @@ def upsert_about():
 @api_bp.route('/skills', methods=['GET'])
 def get_skills():
     skills = Skill.query.order_by(Skill.order).all()
-    return jsonify([{'id': s.id, 'name': s.name, 'category': s.category, 'order': s.order} for s in skills]), 200
+    return jsonify([{'id': s.id, 'name': s.name, 'category': s.category, 'icon': s.icon, 'order': s.order} for s in skills]), 200
 
 @api_bp.route('/skills', methods=['POST'])
 @admin_required
 def create_skill():
     data = request.get_json()
-    skill = Skill(name=data['name'], category=data.get('category'), order=data.get('order', 0))
+    skill = Skill(
+        name=data['name'], 
+        category=data.get('category'), 
+        icon=data.get('icon'),
+        order=data.get('order', 0)
+    )
     db.session.add(skill)
     db.session.commit()
     return jsonify({'id': skill.id}), 201
@@ -126,7 +131,7 @@ def create_skill():
 def update_skill(id):
     skill = Skill.query.get_or_404(id)
     data = request.get_json()
-    for key in ['name', 'category', 'order']:
+    for key in ['name', 'category', 'icon', 'order']:
         if key in data:
             setattr(skill, key, data[key])
     db.session.commit()
