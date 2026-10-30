@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
 import { Contact } from '../../models/portfolio.models';
+import { ToastService } from '../../services/toast.service';
 import { RevealDirective } from '../../shared/reveal.directive';
+import { ModalComponent } from '../../shared/modal.component';
 
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [CommonModule, FormsModule, RevealDirective],
+  imports: [CommonModule, FormsModule, RevealDirective, ModalComponent],
   template: `
     <section class="contact-section">
       <div class="container">
@@ -17,7 +19,7 @@ import { RevealDirective } from '../../shared/reveal.directive';
           <h2 class="section-title">Get in <em>touch</em></h2>
         </header>
 
-        <div *ngIf="!editing" class="contact-body">
+        <div class="contact-body">
           <div class="cta" appReveal>
             <p class="cta-line">Have a project in mind?</p>
             <p class="cta-big">Let's <em>talk.</em></p>
@@ -50,27 +52,27 @@ import { RevealDirective } from '../../shared/reveal.directive';
             </li>
           </ul>
 
-          <button *ngIf="isAdmin" (click)="editing = true" class="edit-contact-btn btn-sm">
+          <button *ngIf="isAdmin" (click)="startEdit()" class="edit-contact-btn btn-sm">
             <img src="assets/icons/edit.svg" alt="" class="ico" />
             Edit contact info
           </button>
         </div>
-
-        <div *ngIf="editing" class="admin-form">
-          <h3>Edit contact info</h3>
-          <input [(ngModel)]="contact.email" placeholder="Email" type="email" />
-          <input [(ngModel)]="contact.phone" placeholder="Phone" />
-          <input [(ngModel)]="contact.linkedin" placeholder="LinkedIn URL" />
-          <input [(ngModel)]="contact.github" placeholder="GitHub URL" />
-          <input [(ngModel)]="contact.location" placeholder="Location" />
-          <input [(ngModel)]="contact.cv_url" placeholder="CV URL" />
-          <div class="btn-row">
-            <button (click)="saveContact()">Save</button>
-            <button class="btn-ghost" (click)="editing = false">Cancel</button>
-          </div>
-        </div>
       </div>
     </section>
+
+    <app-modal [open]="editing" title="Edit contact info" kicker="Get in touch" (closed)="editing = false">
+      <div class="field-row">
+        <label class="field"><span>Email</span><input [(ngModel)]="draft.email" type="email" /></label>
+        <label class="field"><span>Phone</span><input [(ngModel)]="draft.phone" /></label>
+      </div>
+      <label class="field"><span>Location</span><input [(ngModel)]="draft.location" /></label>
+      <div class="field-row">
+        <label class="field"><span>LinkedIn URL</span><input [(ngModel)]="draft.linkedin" /></label>
+        <label class="field"><span>GitHub URL</span><input [(ngModel)]="draft.github" /></label>
+      </div>
+      <label class="field"><span>CV URL</span><input [(ngModel)]="draft.cv_url" /></label>
+      <ng-container modal-actions><button (click)="saveContact()">Save changes</button></ng-container>
+    </app-modal>
 
     <footer class="footer dark">
       <div class="footer-inner">
@@ -173,11 +175,12 @@ export class ContactComponent implements OnInit, OnDestroy {
   isAdmin = false;
   contact: Contact = {};
   editing = false;
+  draft: Contact = {};
   year = new Date().getFullYear();
   localTime = '';
   private clock?: ReturnType<typeof setInterval>;
 
-  constructor(private portfolioService: PortfolioService) {}
+  constructor(private portfolioService: PortfolioService, private toast: ToastService) {}
 
   ngOnInit(): void {
     this.loadContact();
@@ -200,10 +203,24 @@ export class ContactComponent implements OnInit, OnDestroy {
     this.portfolioService.getContact().subscribe(contact => this.contact = contact);
   }
 
+  startEdit(): void {
+    this.draft = { ...this.contact };
+    this.editing = true;
+  }
+
   saveContact(): void {
-    this.portfolioService.updateContact(this.contact).subscribe(() => {
-      this.editing = false;
-      this.loadContact();
+    const email = this.draft.email?.trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.toast.error('Check the email address', `"${email}" doesn't look like a valid email.`);
+      return;
+    }
+    this.portfolioService.updateContact(this.draft).subscribe({
+      next: () => {
+        this.editing = false;
+        this.loadContact();
+        this.toast.success('Contact info updated');
+      },
+      error: err => this.toast.apiError(err, 'Could not update contact info')
     });
   }
 }

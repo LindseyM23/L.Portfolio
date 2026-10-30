@@ -8,6 +8,24 @@ import os
 
 api_bp = Blueprint('api', __name__)
 
+def require_fields(data, fields, partial=False):
+    """Return a 400 response if any required field is missing or blank.
+
+    `fields` maps JSON keys to human-readable labels. With partial=True (updates)
+    only fields present in the payload are checked.
+    """
+    data = data or {}
+    missing = [label for key, label in fields.items()
+               if (not partial or key in data) and not str(data.get(key) or '').strip()]
+    if missing:
+        return jsonify({'error': f"Missing required field{'s' if len(missing) > 1 else ''}: {', '.join(missing)}"}), 400
+    return None
+
+@api_bp.errorhandler(ValueError)
+def handle_value_error(error):
+    # e.g. malformed dates passed to datetime.fromisoformat
+    return jsonify({'error': f'Invalid value: {error}'}), 400
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
@@ -66,6 +84,9 @@ def get_social_links():
 @admin_required
 def create_social_link():
     data = request.get_json()
+    error = require_fields(data, {'platform': 'Platform', 'url': 'URL'})
+    if error:
+        return error
     link = SocialLink(platform=data['platform'], url=data['url'], icon=data.get('icon'), order=data.get('order', 0))
     db.session.add(link)
     db.session.commit()
@@ -76,6 +97,9 @@ def create_social_link():
 def update_social_link(id):
     link = SocialLink.query.get_or_404(id)
     data = request.get_json()
+    error = require_fields(data, {'platform': 'Platform', 'url': 'URL'}, partial=True)
+    if error:
+        return error
     for key in ['platform', 'url', 'icon', 'order']:
         if key in data:
             setattr(link, key, data[key])
@@ -98,6 +122,9 @@ def get_about():
 @admin_required
 def upsert_about():
     data = request.get_json()
+    error = require_fields(data, {'overview': 'Overview'}, partial=True)
+    if error:
+        return error
     about = About.query.first()
     if about:
         about.overview = data.get('overview', about.overview)
@@ -117,6 +144,9 @@ def get_skills():
 @admin_required
 def create_skill():
     data = request.get_json()
+    error = require_fields(data, {'name': 'Skill name'})
+    if error:
+        return error
     skill = Skill(
         name=data['name'], 
         category=data.get('category'), 
@@ -132,6 +162,9 @@ def create_skill():
 def update_skill(id):
     skill = Skill.query.get_or_404(id)
     data = request.get_json()
+    error = require_fields(data, {'name': 'Skill name'}, partial=True)
+    if error:
+        return error
     for key in ['name', 'category', 'icon', 'order']:
         if key in data:
             setattr(skill, key, data[key])
@@ -154,6 +187,9 @@ def get_services():
 @admin_required
 def create_service():
     data = request.get_json()
+    error = require_fields(data, {'title': 'Title', 'description': 'Description'})
+    if error:
+        return error
     service = Service(title=data['title'], description=data['description'], icon=data.get('icon'), order=data.get('order', 0))
     db.session.add(service)
     db.session.commit()
@@ -164,6 +200,9 @@ def create_service():
 def update_service(id):
     service = Service.query.get_or_404(id)
     data = request.get_json()
+    error = require_fields(data, {'title': 'Title', 'description': 'Description'}, partial=True)
+    if error:
+        return error
     for key in ['title', 'description', 'icon', 'order']:
         if key in data:
             setattr(service, key, data[key])
@@ -186,6 +225,9 @@ def get_certifications():
 @admin_required
 def create_certification():
     data = request.get_json()
+    error = require_fields(data, {'name': 'Name'})
+    if error:
+        return error
     cert = Certification(name=data['name'], issuer=data.get('issuer'), badge_image=data.get('badge_image'), cert_image=data.get('cert_image'), issued_date=datetime.fromisoformat(data['issued_date']) if data.get('issued_date') else None, order=data.get('order', 0))
     db.session.add(cert)
     db.session.commit()
@@ -196,6 +238,9 @@ def create_certification():
 def update_certification(id):
     cert = Certification.query.get_or_404(id)
     data = request.get_json()
+    error = require_fields(data, {'name': 'Name'}, partial=True)
+    if error:
+        return error
     for key in ['name', 'issuer', 'badge_image', 'cert_image', 'order']:
         if key in data:
             setattr(cert, key, data[key])
@@ -225,6 +270,9 @@ def get_experience_detail(id):
 @admin_required
 def create_experience():
     data = request.get_json()
+    error = require_fields(data, {'role': 'Role', 'company': 'Company', 'start_date': 'Start date'})
+    if error:
+        return error
     exp = WorkExperience(company=data['company'], role=data['role'], start_date=datetime.fromisoformat(data['start_date']), end_date=datetime.fromisoformat(data['end_date']) if data.get('end_date') else None, summary=data.get('summary'), order=data.get('order', 0))
     db.session.add(exp)
     db.session.commit()
@@ -235,13 +283,16 @@ def create_experience():
 def update_experience(id):
     exp = WorkExperience.query.get_or_404(id)
     data = request.get_json()
+    error = require_fields(data, {'role': 'Role', 'company': 'Company', 'start_date': 'Start date'}, partial=True)
+    if error:
+        return error
     for key in ['company', 'role', 'summary', 'order']:
         if key in data:
             setattr(exp, key, data[key])
     if data.get('start_date'):
         exp.start_date = datetime.fromisoformat(data['start_date'])
-    if data.get('end_date'):
-        exp.end_date = datetime.fromisoformat(data['end_date'])
+    if 'end_date' in data:
+        exp.end_date = datetime.fromisoformat(data['end_date']) if data['end_date'] else None
     db.session.commit()
     return jsonify({'message': 'Updated'}), 200
 
@@ -257,6 +308,9 @@ def delete_experience(id):
 def add_experience_skill(exp_id):
     WorkExperience.query.get_or_404(exp_id)
     data = request.get_json()
+    error = require_fields(data, {'skill_name': 'Skill', 'explanation': 'Explanation'})
+    if error:
+        return error
     skill = ExperienceSkill(experience_id=exp_id, skill_name=data['skill_name'], explanation=data['explanation'], order=data.get('order', 0))
     db.session.add(skill)
     db.session.commit()
@@ -267,6 +321,9 @@ def add_experience_skill(exp_id):
 def update_experience_skill(id):
     skill = ExperienceSkill.query.get_or_404(id)
     data = request.get_json()
+    error = require_fields(data, {'skill_name': 'Skill', 'explanation': 'Explanation'}, partial=True)
+    if error:
+        return error
     for key in ['skill_name', 'explanation', 'order']:
         if key in data:
             setattr(skill, key, data[key])
@@ -302,6 +359,9 @@ def get_project(id):
 @admin_required
 def create_project():
     data = request.get_json()
+    error = require_fields(data, {'name': 'Name', 'description': 'Description'})
+    if error:
+        return error
     project = Project(name=data['name'], description=data['description'], image=data.get('image'), images=json.dumps(data.get('images') or []), live_url=data.get('live_url'), github_url=data.get('github_url'), technologies=data.get('technologies'), order=data.get('order', 0))
     db.session.add(project)
     db.session.commit()
@@ -312,6 +372,9 @@ def create_project():
 def update_project(id):
     project = Project.query.get_or_404(id)
     data = request.get_json()
+    error = require_fields(data, {'name': 'Name', 'description': 'Description'}, partial=True)
+    if error:
+        return error
     for key in ['name', 'description', 'image', 'live_url', 'github_url', 'technologies', 'order']:
         if key in data:
             setattr(project, key, data[key])
@@ -342,6 +405,9 @@ def get_all_kpis():
 @admin_required
 def create_kpi():
     data = request.get_json()
+    error = require_fields(data, {'title': 'Title', 'description': 'Description', 'status': 'Status'})
+    if error:
+        return error
     kpi = KPI(title=data['title'], description=data['description'], status=data['status'], target_date=datetime.fromisoformat(data['target_date']) if data.get('target_date') else None, visibility=data.get('visibility', 'Public'), order=data.get('order', 0))
     db.session.add(kpi)
     db.session.commit()
@@ -352,6 +418,9 @@ def create_kpi():
 def update_kpi(id):
     kpi = KPI.query.get_or_404(id)
     data = request.get_json()
+    error = require_fields(data, {'title': 'Title', 'description': 'Description', 'status': 'Status'}, partial=True)
+    if error:
+        return error
     for key in ['title', 'description', 'status', 'visibility', 'order']:
         if key in data:
             setattr(kpi, key, data[key])

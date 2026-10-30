@@ -4,8 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
 import { Project } from '../../models/portfolio.models';
+import { ToastService } from '../../services/toast.service';
 import { SlideshowComponent } from '../../shared/slideshow.component';
 import { ImageManagerComponent } from '../../shared/image-manager.component';
+import { ModalComponent } from '../../shared/modal.component';
 
 interface Block {
   heading: boolean;
@@ -15,7 +17,7 @@ interface Block {
 @Component({
   selector: 'app-project-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SlideshowComponent, ImageManagerComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SlideshowComponent, ImageManagerComponent, ModalComponent],
   template: `
     <div class="detail-page" *ngIf="project">
       <div class="hero-band dark">
@@ -40,15 +42,8 @@ interface Block {
           </app-slideshow>
         </div>
 
-        <div *ngIf="isAdmin && !editingImages" class="admin-actions">
+        <div *ngIf="isAdmin" class="admin-actions">
           <button (click)="editingImages = true">Manage images</button>
-        </div>
-        <div *ngIf="editingImages" class="admin-form">
-          <app-image-manager [(images)]="draftImages"></app-image-manager>
-          <div class="btn-row">
-            <button (click)="saveImages()">Save images</button>
-            <button class="btn-ghost" (click)="cancelImages()">Cancel</button>
-          </div>
         </div>
 
         <div class="content-grid">
@@ -67,6 +62,11 @@ interface Block {
             </ng-container>
           </article>
         </div>
+
+        <app-modal [open]="editingImages" title="Manage images" [kicker]="project.name" [wide]="true" (closed)="cancelImages()">
+          <app-image-manager [(images)]="draftImages"></app-image-manager>
+          <ng-container modal-actions><button (click)="saveImages()">Save images</button></ng-container>
+        </app-modal>
 
         <a *ngIf="nextProject" class="next" [routerLink]="['/projects', nextProject.id]">
           <span class="mono label">Next project</span>
@@ -117,7 +117,6 @@ interface Block {
       font-family: $font-display; font-size: clamp(6rem, 20vw, 16rem); font-weight: 800;
       line-height: 0.9; letter-spacing: -0.06em; color: transparent; -webkit-text-stroke: 1.5px $white;
     }
-    .admin-form { margin-top: $spacing-md; }
 
     .content-grid {
       display: grid;
@@ -171,7 +170,8 @@ export class ProjectDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private portfolioService: PortfolioService
+    private portfolioService: PortfolioService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -225,6 +225,12 @@ export class ProjectDetailComponent implements OnInit {
   saveImages(): void {
     if (!this.project?.id) return;
     const update = { ...this.project, images: this.draftImages, image: this.draftImages[0] ?? '' };
-    this.portfolioService.updateProject(this.project.id, update).subscribe(() => this.loadProject(this.project!.id!));
+    this.portfolioService.updateProject(this.project.id, update).subscribe({
+      next: () => {
+        this.loadProject(this.project!.id!);
+        this.toast.success('Images saved');
+      },
+      error: err => this.toast.apiError(err, 'Could not save images')
+    });
   }
 }

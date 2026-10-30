@@ -3,12 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
 import { KPI } from '../../models/portfolio.models';
+import { ToastService } from '../../services/toast.service';
+import { ConfirmService } from '../../services/confirm.service';
 import { RevealDirective } from '../../shared/reveal.directive';
+import { ModalComponent } from '../../shared/modal.component';
 
 @Component({
   selector: 'app-kpis',
   standalone: true,
-  imports: [CommonModule, FormsModule, RevealDirective],
+  imports: [CommonModule, FormsModule, RevealDirective, ModalComponent],
   template: `
     <section class="kpis-section dark">
       <div class="container">
@@ -24,7 +27,7 @@ import { RevealDirective } from '../../shared/reveal.directive';
 
         <div class="kpis-grid">
           <article *ngFor="let kpi of kpis; let i = index" class="kpi-card" [ngClass]="'status-' + statusKey(kpi.status)" appReveal [revealDelay]="i * 0.08">
-            <ng-container *ngIf="editingKPI !== kpi.id">
+            <ng-container>
               <div class="kpi-top">
                 <span class="kpi-num">{{ (i + 1).toString().padStart(2, '0') }}</span>
                 <span class="status-badge mono"><span class="glyph"></span>{{ kpi.status }}</span>
@@ -45,52 +48,56 @@ import { RevealDirective } from '../../shared/reveal.directive';
                 <button class="btn-ghost" (click)="deleteKPI(kpi.id!)">Delete</button>
               </div>
             </ng-container>
-
-            <div *ngIf="editingKPI === kpi.id" class="edit-form-inline">
-              <h4 class="mono">Edit KPI</h4>
-              <input [(ngModel)]="editKPIData.title" placeholder="KPI Title" />
-              <textarea [(ngModel)]="editKPIData.description" placeholder="Description" rows="4"></textarea>
-              <select [(ngModel)]="editKPIData.status">
-                <option value="Planned">Planned</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Completed">Completed</option>
-              </select>
-              <input [(ngModel)]="editKPIData.target_date" type="date" />
-              <select [(ngModel)]="editKPIData.visibility">
-                <option value="Public">Public</option>
-                <option value="Coming Soon">Coming Soon</option>
-              </select>
-              <div class="btn-row">
-                <button (click)="saveEditKPI()">Save</button>
-                <button class="btn-ghost" (click)="cancelEditKPI()">Cancel</button>
-              </div>
-            </div>
           </article>
 
-          <div *ngIf="isAdmin && !adding" class="add-tile" (click)="adding = true">+ Add KPI</div>
+          <div *ngIf="isAdmin" class="add-tile" (click)="adding = true">+ Add KPI</div>
         </div>
+      </div>
+    </section>
 
-        <div *ngIf="adding" class="admin-form">
-          <h3>Add KPI</h3>
-          <input [(ngModel)]="newKPI.title" placeholder="KPI Title" />
-          <textarea [(ngModel)]="newKPI.description" placeholder="Description" rows="4"></textarea>
+    <app-modal [open]="editingKPI !== null" title="Edit KPI" kicker="Roadmap" (closed)="cancelEditKPI()">
+      <label class="field"><span>Title</span><input [(ngModel)]="editKPIData.title" /></label>
+      <label class="field"><span>Description</span><textarea [(ngModel)]="editKPIData.description" rows="5"></textarea></label>
+      <div class="field-row">
+        <label class="field"><span>Status</span>
+          <select [(ngModel)]="editKPIData.status">
+            <option value="Planned">Planned</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </label>
+        <label class="field"><span>Target date</span><input [(ngModel)]="editKPIData.target_date" type="date" /></label>
+      </div>
+      <label class="field"><span>Visibility</span>
+        <select [(ngModel)]="editKPIData.visibility">
+          <option value="Public">Public</option>
+          <option value="Coming Soon">Coming Soon (hidden from visitors)</option>
+        </select>
+      </label>
+      <ng-container modal-actions><button (click)="saveEditKPI()">Save changes</button></ng-container>
+    </app-modal>
+
+    <app-modal [open]="adding" title="Add KPI" kicker="Roadmap" (closed)="cancelAdd()">
+      <label class="field"><span>Title</span><input [(ngModel)]="newKPI.title" /></label>
+      <label class="field"><span>Description</span><textarea [(ngModel)]="newKPI.description" rows="5"></textarea></label>
+      <div class="field-row">
+        <label class="field"><span>Status</span>
           <select [(ngModel)]="newKPI.status">
             <option value="Planned">Planned</option>
             <option value="In Progress">In Progress</option>
             <option value="Completed">Completed</option>
           </select>
-          <input [(ngModel)]="newKPI.target_date" type="date" />
-          <select [(ngModel)]="newKPI.visibility">
-            <option value="Public">Public</option>
-            <option value="Coming Soon">Coming Soon</option>
-          </select>
-          <div class="btn-row">
-            <button (click)="addKPI()">Add</button>
-            <button class="btn-ghost" (click)="cancelAdd()">Cancel</button>
-          </div>
-        </div>
+        </label>
+        <label class="field"><span>Target date</span><input [(ngModel)]="newKPI.target_date" type="date" /></label>
       </div>
-    </section>
+      <label class="field"><span>Visibility</span>
+        <select [(ngModel)]="newKPI.visibility">
+          <option value="Public">Public</option>
+          <option value="Coming Soon">Coming Soon (hidden from visitors)</option>
+        </select>
+      </label>
+      <ng-container modal-actions><button (click)="addKPI()">Add KPI</button></ng-container>
+    </app-modal>
   `,
   styles: [`
     @import '../../../theme.scss';
@@ -139,7 +146,6 @@ import { RevealDirective } from '../../shared/reveal.directive';
     .meter span { height: 4px; background: var(--line); }
     .meter span.on { background: var(--fg); }
     .target-date, .hidden-tag { font-size: 10px; color: var(--muted); }
-    .edit-form-inline { display: flex; flex-direction: column; gap: $spacing-xs; }
     .add-tile { margin: $spacing-lg; }
     @media (max-width: $bp-tablet) {
       .kpi-card, .kpi-card:not(:nth-child(3n+1)) { padding: $spacing-lg 0; border-left: none; min-height: 0; }
@@ -154,7 +160,11 @@ export class KpisComponent implements OnInit {
   newKPI: KPI = { title: '', description: '', status: 'Planned', visibility: 'Public', order: 0 };
   editKPIData: KPI = { title: '', description: '', status: 'Planned', visibility: 'Public', order: 0 };
 
-  constructor(private portfolioService: PortfolioService) {}
+  constructor(
+    private portfolioService: PortfolioService,
+    private toast: ToastService,
+    private confirm: ConfirmService
+  ) {}
 
   ngOnInit(): void {
     this.loadKPIs();
@@ -185,9 +195,14 @@ export class KpisComponent implements OnInit {
   }
 
   addKPI(): void {
-    this.portfolioService.createKPI(this.newKPI).subscribe(() => {
-      this.loadKPIs();
-      this.cancelAdd();
+    if (!this.toast.require({ Title: this.newKPI.title, Description: this.newKPI.description, Status: this.newKPI.status })) return;
+    this.portfolioService.createKPI(this.newKPI).subscribe({
+      next: () => {
+        this.loadKPIs();
+        this.cancelAdd();
+        this.toast.success('KPI added');
+      },
+      error: err => this.toast.apiError(err, 'Could not add KPI')
     });
   }
 
@@ -202,12 +217,15 @@ export class KpisComponent implements OnInit {
   }
 
   saveEditKPI(): void {
-    if (this.editingKPI && this.editKPIData.title.trim()) {
-      this.portfolioService.updateKPI(this.editingKPI, this.editKPIData).subscribe(() => {
+    if (!this.editingKPI || !this.toast.require({ Title: this.editKPIData.title, Description: this.editKPIData.description, Status: this.editKPIData.status })) return;
+    this.portfolioService.updateKPI(this.editingKPI, this.editKPIData).subscribe({
+      next: () => {
         this.loadKPIs();
         this.cancelEditKPI();
-      });
-    }
+        this.toast.success('KPI updated');
+      },
+      error: err => this.toast.apiError(err, 'Could not update KPI')
+    });
   }
 
   cancelEditKPI(): void {
@@ -215,9 +233,14 @@ export class KpisComponent implements OnInit {
     this.editKPIData = { title: '', description: '', status: 'Planned', visibility: 'Public', order: 0 };
   }
 
-  deleteKPI(id: number): void {
-    if (confirm('Delete this KPI?')) {
-      this.portfolioService.deleteKPI(id).subscribe(() => this.loadKPIs());
-    }
+  async deleteKPI(id: number): Promise<void> {
+    if (!(await this.confirm.delete('KPI', this.kpis.find(k => k.id === id)?.title))) return;
+    this.portfolioService.deleteKPI(id).subscribe({
+      next: () => {
+        this.loadKPIs();
+        this.toast.success('KPI deleted');
+      },
+      error: err => this.toast.apiError(err, 'Could not delete KPI')
+    });
   }
 }

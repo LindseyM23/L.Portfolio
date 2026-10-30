@@ -194,6 +194,34 @@ input[type='date'] {
   @include button-ghost;
 }
 
+// Labelled form field used inside <app-modal>
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  > span {
+    @include mono-label;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .hint {
+    font-size: 11px;
+    color: var(--muted);
+  }
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $spacing-sm;
+
+  @media (max-width: $bp-mobile) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .btn-sm {
   padding: 6px 14px;
   font-size: 12px;
@@ -289,23 +317,24 @@ input[type='date'] {
 // ========== Admin mode indicator ==========
 .admin-indicator {
   position: fixed;
-  bottom: $spacing-md;
+  bottom: $spacing-sm;
   left: 50%;
   transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: $black;
   color: $white;
-  padding: 10px 20px;
+  padding: 5px 12px;
   border: 1px solid $white;
   border-radius: $pill;
   @include mono-label;
+  font-size: 9px;
   z-index: $z-header + 1;
 
   .pulse {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: $white;
     animation: pulse 1.6s ease-in-out infinite;

@@ -37,20 +37,11 @@
             </button>
           </a>
 
-          <button *ngIf="isAdmin && !addingLink"
+          <button *ngIf="isAdmin"
                   (click)="addingLink = true"
                   class="btn-ghost btn-sm">
             + Add link
           </button>
-        </div>
-
-        <div *ngIf="isAdmin && addingLink" class="add-form">
-          <input [(ngModel)]="newLink.platform" placeholder="Platform (e.g., GitHub)" />
-          <input [(ngModel)]="newLink.url" placeholder="URL" />
-          <div class="btn-row">
-            <button (click)="addLink()">Save</button>
-            <button class="btn-ghost" (click)="addingLink = false">Cancel</button>
-          </div>
         </div>
       </div>
 
@@ -97,6 +88,12 @@
     </a>
   </div>
 </section>
+
+<app-modal [open]="addingLink" title="Add social link" kicker="Hero" (closed)="addingLink = false">
+  <label class="field"><span>Platform</span><input [(ngModel)]="newLink.platform" placeholder="e.g. GitHub, LinkedIn, CV" /><small class="hint">GitHub, LinkedIn, TikTok, Instagram and CV get their own icons.</small></label>
+  <label class="field"><span>URL</span><input [(ngModel)]="newLink.url" placeholder="https://" /></label>
+  <ng-container modal-actions><button (click)="addLink()">Add link</button></ng-container>
+</app-modal>
 
 <div class="marquee dark" aria-hidden="true">
   <div class="marquee-track">

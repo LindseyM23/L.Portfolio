@@ -3,7 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
 import { Project } from '../../models/portfolio.models';
+import { ToastService } from '../../services/toast.service';
+import { ConfirmService } from '../../services/confirm.service';
 import { RevealDirective } from '../../shared/reveal.directive';
+import { ModalComponent } from '../../shared/modal.component';
 import { SlideshowComponent } from '../../shared/slideshow.component';
 import { ImageManagerComponent } from '../../shared/image-manager.component';
 import { Router } from '@angular/router';
@@ -11,7 +14,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [CommonModule, FormsModule, RevealDirective, SlideshowComponent, ImageManagerComponent],
+  imports: [CommonModule, FormsModule, RevealDirective, SlideshowComponent, ImageManagerComponent, ModalComponent],
   template: `
     <section class="projects-section">
       <div class="container">
@@ -23,7 +26,7 @@ import { Router } from '@angular/router';
 
         <div class="projects-list">
           <article *ngFor="let project of projects; let i = index" class="project" appReveal>
-            <ng-container *ngIf="editingProject !== project.id">
+            <ng-container>
               <div class="visual" (click)="viewDetails(project.id!)">
                 <app-slideshow [images]="project.images || []" [alt]="project.name">
                   <div class="visual-placeholder">
@@ -54,40 +57,36 @@ import { Router } from '@angular/router';
                 </div>
               </div>
             </ng-container>
-
-            <div *ngIf="editingProject === project.id" class="edit-form-inline">
-              <h4 class="mono">Edit project</h4>
-              <input [(ngModel)]="editProjectData.name" placeholder="Project Name" />
-              <textarea [(ngModel)]="editProjectData.description" placeholder="Description" rows="6"></textarea>
-              <app-image-manager [(images)]="editProjectData.images!"></app-image-manager>
-              <input [(ngModel)]="editProjectData.technologies" placeholder="Technologies (comma-separated)" />
-              <input [(ngModel)]="editProjectData.live_url" placeholder="Live URL" />
-              <input [(ngModel)]="editProjectData.github_url" placeholder="GitHub URL" />
-              <div class="btn-row">
-                <button (click)="saveEditProject()">Save</button>
-                <button class="btn-ghost" (click)="cancelEditProject()">Cancel</button>
-              </div>
-            </div>
           </article>
         </div>
 
-        <div *ngIf="isAdmin && !adding" class="add-tile" (click)="adding = true">+ Add project</div>
-
-        <div *ngIf="adding" class="admin-form">
-          <h3>Add project</h3>
-          <input [(ngModel)]="newProject.name" placeholder="Project Name" />
-          <textarea [(ngModel)]="newProject.description" placeholder="Description" rows="6"></textarea>
-          <app-image-manager [(images)]="newProject.images!"></app-image-manager>
-          <input [(ngModel)]="newProject.technologies" placeholder="Technologies (comma-separated)" />
-          <input [(ngModel)]="newProject.live_url" placeholder="Live URL" />
-          <input [(ngModel)]="newProject.github_url" placeholder="GitHub URL" />
-          <div class="btn-row">
-            <button (click)="addProject()">Add</button>
-            <button class="btn-ghost" (click)="cancelAdd()">Cancel</button>
-          </div>
-        </div>
+        <div *ngIf="isAdmin" class="add-tile" (click)="adding = true">+ Add project</div>
       </div>
     </section>
+
+    <app-modal [open]="editingProject !== null" title="Edit project" kicker="Selected work" [wide]="true" (closed)="cancelEditProject()">
+      <label class="field"><span>Name</span><input [(ngModel)]="editProjectData.name" /></label>
+      <label class="field"><span>Description</span><textarea [(ngModel)]="editProjectData.description" rows="8"></textarea><small class="hint">Separate paragraphs with a blank line. Short lines on their own become subheadings.</small></label>
+      <app-image-manager [(images)]="editProjectData.images!"></app-image-manager>
+      <label class="field"><span>Technologies</span><input [(ngModel)]="editProjectData.technologies" placeholder="Comma-separated, e.g. Angular, AWS, Python" /></label>
+      <div class="field-row">
+        <label class="field"><span>Live URL</span><input [(ngModel)]="editProjectData.live_url" /></label>
+        <label class="field"><span>GitHub URL</span><input [(ngModel)]="editProjectData.github_url" /></label>
+      </div>
+      <ng-container modal-actions><button (click)="saveEditProject()">Save changes</button></ng-container>
+    </app-modal>
+
+    <app-modal [open]="adding" title="Add project" kicker="Selected work" [wide]="true" (closed)="cancelAdd()">
+      <label class="field"><span>Name</span><input [(ngModel)]="newProject.name" /></label>
+      <label class="field"><span>Description</span><textarea [(ngModel)]="newProject.description" rows="8"></textarea><small class="hint">Separate paragraphs with a blank line. Short lines on their own become subheadings.</small></label>
+      <app-image-manager [(images)]="newProject.images!"></app-image-manager>
+      <label class="field"><span>Technologies</span><input [(ngModel)]="newProject.technologies" placeholder="Comma-separated, e.g. Angular, AWS, Python" /></label>
+      <div class="field-row">
+        <label class="field"><span>Live URL</span><input [(ngModel)]="newProject.live_url" /></label>
+        <label class="field"><span>GitHub URL</span><input [(ngModel)]="newProject.github_url" /></label>
+      </div>
+      <ng-container modal-actions><button (click)="addProject()">Add project</button></ng-container>
+    </app-modal>
   `,
   styles: [`
     @import '../../../theme.scss';
@@ -171,8 +170,6 @@ import { Router } from '@angular/router';
     .link-btn:hover span { transform: rotate(45deg); }
     .link-btn:hover, .link-btn.ghost { background: transparent; color: var(--fg); }
     .link-btn.ghost:hover { background: var(--fg); color: var(--bg); }
-
-    .edit-form-inline { grid-column: 1 / -1; display: flex; flex-direction: column; gap: $spacing-xs; }
     .add-tile { margin-top: $spacing-xl; min-height: 100px; }
 
     @media (max-width: $bp-mobile) {
@@ -191,7 +188,9 @@ export class ProjectsComponent implements OnInit {
 
   constructor(
     private portfolioService: PortfolioService,
-    private router: Router
+    private router: Router,
+    private toast: ToastService,
+    private confirm: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -223,10 +222,15 @@ export class ProjectsComponent implements OnInit {
   }
 
   addProject(): void {
+    if (!this.toast.require({ Name: this.newProject.name, Description: this.newProject.description })) return;
     this.newProject.image = this.newProject.images?.[0];
-    this.portfolioService.createProject(this.newProject).subscribe(() => {
-      this.loadProjects();
-      this.cancelAdd();
+    this.portfolioService.createProject(this.newProject).subscribe({
+      next: () => {
+        this.loadProjects();
+        this.cancelAdd();
+        this.toast.success('Project added');
+      },
+      error: err => this.toast.apiError(err, 'Could not add project')
     });
   }
 
@@ -241,13 +245,16 @@ export class ProjectsComponent implements OnInit {
   }
 
   saveEditProject(): void {
-    if (this.editingProject && this.editProjectData.name.trim()) {
-      this.editProjectData.image = this.editProjectData.images?.[0] ?? '';
-      this.portfolioService.updateProject(this.editingProject, this.editProjectData).subscribe(() => {
+    if (!this.editingProject || !this.toast.require({ Name: this.editProjectData.name, Description: this.editProjectData.description })) return;
+    this.editProjectData.image = this.editProjectData.images?.[0] ?? '';
+    this.portfolioService.updateProject(this.editingProject, this.editProjectData).subscribe({
+      next: () => {
         this.loadProjects();
         this.cancelEditProject();
-      });
-    }
+        this.toast.success('Project updated');
+      },
+      error: err => this.toast.apiError(err, 'Could not update project')
+    });
   }
 
   cancelEditProject(): void {
@@ -255,9 +262,14 @@ export class ProjectsComponent implements OnInit {
     this.editProjectData = { name: '', description: '', images: [], order: 0 };
   }
 
-  deleteProject(id: number): void {
-    if (confirm('Delete this project?')) {
-      this.portfolioService.deleteProject(id).subscribe(() => this.loadProjects());
-    }
+  async deleteProject(id: number): Promise<void> {
+    if (!(await this.confirm.delete('project', this.projects.find(pr => pr.id === id)?.name))) return;
+    this.portfolioService.deleteProject(id).subscribe({
+      next: () => {
+        this.loadProjects();
+        this.toast.success('Project deleted');
+      },
+      error: err => this.toast.apiError(err, 'Could not delete project')
+    });
   }
 }

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { PortfolioService } from '../services/portfolio.service';
+import { ToastService } from '../services/toast.service';
 
 /**
  * Admin control for a list of images: upload several at once,
@@ -70,12 +71,16 @@ export class ImageManagerComponent {
 
   uploading = false;
 
-  constructor(private portfolioService: PortfolioService) {}
+  constructor(private portfolioService: PortfolioService, private toast: ToastService) {}
 
   upload(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const files = Array.from(input.files ?? []).filter(f => f.type.startsWith('image/'));
+    const chosen = Array.from(input.files ?? []);
+    const files = chosen.filter(f => f.type.startsWith('image/'));
     input.value = '';
+    if (files.length < chosen.length) {
+      this.toast.error('Some files were skipped', 'Only image files can be added to the slideshow.');
+    }
     if (!files.length) return;
 
     this.uploading = true;
@@ -83,10 +88,11 @@ export class ImageManagerComponent {
       next: responses => {
         this.emit([...this.images, ...responses.map(r => `http://localhost:5001${r.url}`)]);
         this.uploading = false;
+        this.toast.info(`${files.length} image${files.length > 1 ? 's' : ''} uploaded`, 'Remember to save to keep them.');
       },
-      error: () => {
+      error: err => {
         this.uploading = false;
-        alert('Failed to upload one or more images');
+        this.toast.apiError(err, 'Could not upload images');
       }
     });
   }

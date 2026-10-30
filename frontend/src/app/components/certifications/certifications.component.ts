@@ -3,12 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
 import { Certification } from '../../models/portfolio.models';
+import { ToastService } from '../../services/toast.service';
+import { ConfirmService } from '../../services/confirm.service';
 import { RevealDirective } from '../../shared/reveal.directive';
+import { ModalComponent } from '../../shared/modal.component';
 
 @Component({
   selector: 'app-certifications',
   standalone: true,
-  imports: [CommonModule, FormsModule, RevealDirective],
+  imports: [CommonModule, FormsModule, RevealDirective, ModalComponent],
   template: `
     <section class="certs-section">
       <div class="container">
@@ -20,7 +23,7 @@ import { RevealDirective } from '../../shared/reveal.directive';
 
         <div class="certs-grid">
           <article *ngFor="let cert of certifications; let i = index" class="cert-item" appReveal [revealDelay]="i * 0.1">
-            <div class="cert-card" *ngIf="editingCert !== cert.id"
+            <div class="cert-card"
                  [class.clickable]="cert.cert_image"
                  (click)="cert.cert_image && (showCertImage = cert.id!)">
               <span class="cert-num mono">No. {{ (i + 1).toString().padStart(2, '0') }}</span>
@@ -39,65 +42,64 @@ import { RevealDirective } from '../../shared/reveal.directive';
                 <button class="btn-ghost" (click)="deleteCert(cert.id!)">Delete</button>
               </div>
             </div>
-
-            <div class="cert-card edit-mode" *ngIf="editingCert === cert.id">
-              <h4 class="mono">Edit certification</h4>
-              <input [(ngModel)]="editCertData.name" placeholder="Certification Name" />
-              <input [(ngModel)]="editCertData.issuer" placeholder="Issuer" />
-              <input [(ngModel)]="editCertData.issued_date" type="date" />
-              <div class="btn-row">
-                <button (click)="saveEditCert()">Save</button>
-                <button class="btn-ghost" (click)="cancelEditCert()">Cancel</button>
-              </div>
-            </div>
-
-            <div *ngIf="cert.cert_image && showCertImage === cert.id" class="cert-overlay" (click)="showCertImage = null">
-              <img [src]="cert.cert_image" alt="Certificate" />
-            </div>
           </article>
 
-          <div *ngIf="isAdmin && !adding" class="add-tile" (click)="adding = true">+ Add certification</div>
-        </div>
-
-        <div *ngIf="adding" class="admin-form">
-          <h3>Add certification</h3>
-          <input [(ngModel)]="newCert.name" placeholder="Certification Name" />
-          <input [(ngModel)]="newCert.issuer" placeholder="Issuer" />
-
-          <label>Badge image</label>
-          <div class="file-row">
-            <input type="file" #badgeInput (change)="onBadgeUpload($event)" accept="image/*" hidden />
-            <button type="button" (click)="badgeInput.click()" class="btn-sm">
-              <img src="assets/icons/camera.svg" alt="" class="ico" />
-              Upload badge
-            </button>
-            <span *ngIf="badgePreview" class="preview">
-              <img [src]="badgePreview" alt="Preview" />
-              <button type="button" (click)="clearBadge()" class="btn-sm btn-ghost">✕</button>
-            </span>
-          </div>
-
-          <label>Certificate image (optional)</label>
-          <div class="file-row">
-            <input type="file" #certInput (change)="onCertUpload($event)" accept="image/*" hidden />
-            <button type="button" (click)="certInput.click()" class="btn-sm">
-              <img src="assets/icons/camera.svg" alt="" class="ico" />
-              Upload certificate
-            </button>
-            <span *ngIf="certPreview" class="preview">
-              <img [src]="certPreview" alt="Preview" />
-              <button type="button" (click)="clearCert()" class="btn-sm btn-ghost">✕</button>
-            </span>
-          </div>
-
-          <input [(ngModel)]="newCert.issued_date" type="date" />
-          <div class="btn-row">
-            <button (click)="addCert()">Add</button>
-            <button class="btn-ghost" (click)="cancelAdd()">Cancel</button>
-          </div>
+          <div *ngIf="isAdmin" class="add-tile" (click)="adding = true">+ Add certification</div>
         </div>
       </div>
     </section>
+
+    <div *ngIf="certImage" class="cert-overlay" (click)="showCertImage = null">
+      <img [src]="certImage" alt="Certificate" />
+    </div>
+
+    <app-modal [open]="editingCert !== null" title="Edit certification" kicker="Certs & badges" (closed)="cancelEditCert()">
+      <label class="field"><span>Name</span><input [(ngModel)]="editCertData.name" /></label>
+      <div class="field-row">
+        <label class="field"><span>Issuer</span><input [(ngModel)]="editCertData.issuer" /></label>
+        <label class="field"><span>Issued</span><input [(ngModel)]="editCertData.issued_date" type="date" /></label>
+      </div>
+      <ng-container modal-actions><button (click)="saveEditCert()">Save changes</button></ng-container>
+    </app-modal>
+
+    <app-modal [open]="adding" title="Add certification" kicker="Certs & badges" (closed)="cancelAdd()">
+      <label class="field"><span>Name</span><input [(ngModel)]="newCert.name" placeholder="e.g. AWS Certified Developer" /></label>
+      <div class="field-row">
+        <label class="field"><span>Issuer</span><input [(ngModel)]="newCert.issuer" placeholder="e.g. AWS" /></label>
+        <label class="field"><span>Issued</span><input [(ngModel)]="newCert.issued_date" type="date" /></label>
+      </div>
+
+      <div class="field">
+        <span>Badge image</span>
+        <div class="file-row">
+          <input type="file" #badgeInput (change)="onBadgeUpload($event)" accept="image/*" hidden />
+          <button type="button" (click)="badgeInput.click()" class="btn-sm">
+            <img src="assets/icons/camera.svg" alt="" class="ico" />
+            Upload badge
+          </button>
+          <span *ngIf="badgePreview" class="preview">
+            <img [src]="badgePreview" alt="Preview" />
+            <button type="button" (click)="clearBadge()" class="btn-sm btn-ghost">✕</button>
+          </span>
+        </div>
+      </div>
+
+      <div class="field">
+        <span>Certificate image (optional)</span>
+        <div class="file-row">
+          <input type="file" #certInput (change)="onCertUpload($event)" accept="image/*" hidden />
+          <button type="button" (click)="certInput.click()" class="btn-sm">
+            <img src="assets/icons/camera.svg" alt="" class="ico" />
+            Upload certificate
+          </button>
+          <span *ngIf="certPreview" class="preview">
+            <img [src]="certPreview" alt="Preview" />
+            <button type="button" (click)="clearCert()" class="btn-sm btn-ghost">✕</button>
+          </span>
+        </div>
+      </div>
+      <ng-container modal-actions><button (click)="addCert()">Add certification</button></ng-container>
+    </app-modal>
   `,
   styles: [`
     @import '../../../theme.scss';
@@ -119,7 +121,7 @@ import { RevealDirective } from '../../shared/reveal.directive';
       transition: transform $transition-normal, box-shadow $transition-normal;
       transform-style: preserve-3d;
     }
-    .cert-card:not(.edit-mode):hover {
+    .cert-card:hover {
       transform: rotateX(6deg) rotateY(-8deg) translateY(-6px);
       box-shadow: 10px 14px 0 var(--fg);
     }
@@ -150,7 +152,6 @@ import { RevealDirective } from '../../shared/reveal.directive';
     .cert-meta { display: flex; justify-content: center; gap: $spacing-sm; color: var(--muted); font-size: 11px; }
     .cert-meta span + span::before { content: '/'; margin-right: $spacing-sm; }
     .admin-actions { justify-content: center; }
-    .cert-card.edit-mode { display: flex; flex-direction: column; gap: $spacing-xs; text-align: left; }
     .file-row { display: flex; align-items: center; gap: $spacing-sm; flex-wrap: wrap; }
     .preview { display: inline-flex; align-items: center; gap: $spacing-xs; }
     .preview img { width: 56px; height: 56px; object-fit: contain; }
@@ -163,6 +164,23 @@ import { RevealDirective } from '../../shared/reveal.directive';
       cursor: zoom-out;
     }
     .cert-overlay img { max-width: 90%; max-height: 90%; }
+    @media (max-width: $bp-mobile) {
+      .certs-grid { grid-template-columns: 1fr; gap: $spacing-sm; }
+      .cert-card {
+        display: grid;
+        grid-template-columns: 88px 1fr;
+        align-items: center;
+        column-gap: $spacing-md;
+        padding: $spacing-md;
+        text-align: left;
+      }
+      .cert-card:hover { transform: none; box-shadow: 5px 5px 0 var(--fg); }
+      .cert-num { position: static; grid-column: 2; margin-bottom: 2px; }
+      .badge-wrap { grid-column: 1; grid-row: 1 / span 4; width: 88px; height: 88px; margin: 0; outline-offset: 5px; transform: none; }
+      .cert-card h4 { grid-column: 2; font-size: 1rem; transform: none; }
+      .cert-meta { grid-column: 2; justify-content: flex-start; font-size: 10px; }
+      .admin-actions { grid-column: 1 / -1; justify-content: flex-start; }
+    }
   `]
 })
 export class CertificationsComponent implements OnInit {
@@ -178,11 +196,19 @@ export class CertificationsComponent implements OnInit {
   certPreview: string | null = null;
   certFile: File | null = null;
 
-  constructor(private portfolioService: PortfolioService) {}
+  constructor(
+    private portfolioService: PortfolioService,
+    private toast: ToastService,
+    private confirm: ConfirmService
+  ) {}
 
   ngOnInit(): void {
     this.loadCerts();
     this.portfolioService.adminMode$.subscribe(mode => this.isAdmin = mode);
+  }
+
+  get certImage(): string | undefined {
+    return this.certifications.find(c => c.id === this.showCertImage)?.cert_image;
   }
 
   loadCerts(): void {
@@ -190,6 +216,7 @@ export class CertificationsComponent implements OnInit {
   }
 
   addCert(): void {
+    if (!this.toast.require({ Name: this.newCert.name })) return;
     // Upload badge image first if provided
     if (this.badgeFile) {
       this.portfolioService.uploadFile(this.badgeFile).subscribe({
@@ -197,9 +224,7 @@ export class CertificationsComponent implements OnInit {
           this.newCert.badge_image = `http://localhost:5001${response.url}`;
           this.uploadCertOrCreate();
         },
-        error: () => {
-          alert('Failed to upload badge image');
-        }
+        error: err => this.toast.apiError(err, 'Could not upload badge image')
       });
     } else {
       this.uploadCertOrCreate();
@@ -214,9 +239,7 @@ export class CertificationsComponent implements OnInit {
           this.newCert.cert_image = `http://localhost:5001${response.url}`;
           this.createCertification();
         },
-        error: () => {
-          alert('Failed to upload certificate image');
-        }
+        error: err => this.toast.apiError(err, 'Could not upload certificate image')
       });
     } else {
       this.createCertification();
@@ -224,9 +247,13 @@ export class CertificationsComponent implements OnInit {
   }
 
   private createCertification(): void {
-    this.portfolioService.createCertification(this.newCert).subscribe(() => {
-      this.loadCerts();
-      this.cancelAdd();
+    this.portfolioService.createCertification(this.newCert).subscribe({
+      next: () => {
+        this.loadCerts();
+        this.cancelAdd();
+        this.toast.success('Certification added');
+      },
+      error: err => this.toast.apiError(err, 'Could not add certification')
     });
   }
 
@@ -240,7 +267,7 @@ export class CertificationsComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     } else {
-      alert('Please select an image file');
+      this.toast.error('Unsupported file', 'Please choose an image file (PNG, JPG, SVG, WebP or GIF).');
     }
   }
 
@@ -260,7 +287,7 @@ export class CertificationsComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     } else {
-      alert('Please select an image file');
+      this.toast.error('Unsupported file', 'Please choose an image file (PNG, JPG, SVG, WebP or GIF).');
     }
   }
 
@@ -283,12 +310,15 @@ export class CertificationsComponent implements OnInit {
   }
 
   saveEditCert(): void {
-    if (this.editingCert && this.editCertData.name.trim()) {
-      this.portfolioService.updateCertification(this.editingCert, this.editCertData).subscribe(() => {
+    if (!this.editingCert || !this.toast.require({ Name: this.editCertData.name })) return;
+    this.portfolioService.updateCertification(this.editingCert, this.editCertData).subscribe({
+      next: () => {
         this.loadCerts();
         this.cancelEditCert();
-      });
-    }
+        this.toast.success('Certification updated');
+      },
+      error: err => this.toast.apiError(err, 'Could not update certification')
+    });
   }
 
   cancelEditCert(): void {
@@ -296,9 +326,14 @@ export class CertificationsComponent implements OnInit {
     this.editCertData = { name: '', issuer: '', order: 0 };
   }
 
-  deleteCert(id: number): void {
-    if (confirm('Delete this certification?')) {
-      this.portfolioService.deleteCertification(id).subscribe(() => this.loadCerts());
-    }
+  async deleteCert(id: number): Promise<void> {
+    if (!(await this.confirm.delete('certification', this.certifications.find(c => c.id === id)?.name))) return;
+    this.portfolioService.deleteCertification(id).subscribe({
+      next: () => {
+        this.loadCerts();
+        this.toast.success('Certification deleted');
+      },
+      error: err => this.toast.apiError(err, 'Could not delete certification')
+    });
   }
 }

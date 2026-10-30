@@ -4,11 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
 import { WorkExperience, ExperienceSkill } from '../../models/portfolio.models';
+import { ToastService } from '../../services/toast.service';
+import { ConfirmService } from '../../services/confirm.service';
+import { ModalComponent } from '../../shared/modal.component';
 
 @Component({
   selector: 'app-experience-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ModalComponent],
   template: `
     <div class="detail-page">
       <div class="hero-band dark">
@@ -42,25 +45,21 @@ import { WorkExperience, ExperienceSkill } from '../../models/portfolio.models';
                   <span *ngIf="isAdmin" class="delete-skill" (click)="deleteSkill(skill.id!); $event.stopPropagation()">✕</span>
                 </button>
 
-                <button *ngIf="isAdmin && !addingSkill" class="add-skill-chip btn-ghost" (click)="addingSkill = true">
+                <button *ngIf="isAdmin" class="add-skill-chip btn-ghost" (click)="addingSkill = true">
                   + Add skill
                 </button>
               </div>
               <p *ngIf="!experience.skills_acquired?.length && !isAdmin" class="empty">More detail coming soon.</p>
             </div>
           </div>
-
-          <div *ngIf="addingSkill" class="admin-form">
-            <h4>Add skill</h4>
-            <input [(ngModel)]="newSkill.skill_name" placeholder="Skill Name" />
-            <textarea [(ngModel)]="newSkill.explanation" placeholder="What did you do to acquire this skill?" rows="4"></textarea>
-            <div class="btn-row">
-              <button (click)="addSkill()">Add</button>
-              <button class="btn-ghost" (click)="cancelAddSkill()">Cancel</button>
-            </div>
-          </div>
         </div>
       </div>
+
+      <app-modal [open]="addingSkill" title="Add skill acquired" [kicker]="experience?.role ?? ''" (closed)="cancelAddSkill()">
+        <label class="field"><span>Skill</span><input [(ngModel)]="newSkill.skill_name" placeholder="e.g. Stakeholder management" /></label>
+        <label class="field"><span>How you acquired it</span><textarea [(ngModel)]="newSkill.explanation" rows="6" placeholder="What did you do to acquire this skill?"></textarea></label>
+        <ng-container modal-actions><button (click)="addSkill()">Add skill</button></ng-container>
+      </app-modal>
 
       <div *ngIf="selectedSkill" class="skill-explanation-modal" (click)="selectedSkill = null">
         <div class="modal-content" (click)="$event.stopPropagation()">
@@ -137,7 +136,9 @@ export class ExperienceDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private portfolioService: PortfolioService
+    private portfolioService: PortfolioService,
+    private toast: ToastService,
+    private confirm: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -161,12 +162,16 @@ export class ExperienceDetailComponent implements OnInit {
   }
 
   addSkill(): void {
-    if (this.experience && this.experience.id) {
-      this.portfolioService.addExperienceSkill(this.experience.id, this.newSkill).subscribe(() => {
+    if (!this.experience?.id) return;
+    if (!this.toast.require({ Skill: this.newSkill.skill_name, 'How you acquired it': this.newSkill.explanation })) return;
+    this.portfolioService.addExperienceSkill(this.experience.id, this.newSkill).subscribe({
+      next: () => {
         this.loadExperience(this.experience!.id!);
         this.cancelAddSkill();
-      });
-    }
+        this.toast.success('Skill added');
+      },
+      error: err => this.toast.apiError(err, 'Could not add skill')
+    });
   }
 
   cancelAddSkill(): void {
@@ -174,11 +179,14 @@ export class ExperienceDetailComponent implements OnInit {
     this.newSkill = { skill_name: '', explanation: '', order: 0 };
   }
 
-  deleteSkill(id: number): void {
-    if (confirm('Delete this skill?')) {
-      this.portfolioService.deleteExperienceSkill(id).subscribe(() => {
+  async deleteSkill(id: number): Promise<void> {
+    if (!(await this.confirm.delete('skill', this.experience?.skills_acquired?.find(sk => sk.id === id)?.skill_name))) return;
+    this.portfolioService.deleteExperienceSkill(id).subscribe({
+      next: () => {
         this.loadExperience(this.experience!.id!);
-      });
-    }
+        this.toast.success('Skill deleted');
+      },
+      error: err => this.toast.apiError(err, 'Could not delete skill')
+    });
   }
 }

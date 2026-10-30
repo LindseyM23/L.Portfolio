@@ -179,6 +179,27 @@
   max-width: 340px;
 }
 
+// Compact social pills on phones
+@media (max-width: $bp-mobile) {
+  .social-links { gap: 6px; }
+
+  .social-link {
+    gap: 6px;
+    padding: 4px 12px 4px 4px;
+
+    .social-icon {
+      width: 22px;
+      height: 22px;
+      padding: 3px;
+    }
+
+    .social-label {
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+  }
+}
+
 // ---------- Portrait ----------
 .hero-right {
   justify-self: end;
