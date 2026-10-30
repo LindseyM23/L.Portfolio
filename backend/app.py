@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, redirect
 from flask_cors import CORS
 from flask_migrate import Migrate
+from sqlalchemy import text
 from werkzeug.middleware.proxy_fix import ProxyFix
 from config import get_config
 from models import db
@@ -58,9 +59,13 @@ def create_app(config_class=None):
             'version': '2.1.0'
         })
 
-    # Create tables
+    # Create tables. Several server processes start at once, so on Postgres take
+    # a lock first; otherwise they race and requests fail until all have booted.
     with app.app_context():
-        db.create_all()
+        with db.engine.begin() as connection:
+            if connection.dialect.name == 'postgresql':
+                connection.execute(text('SELECT pg_advisory_xact_lock(724501)'))
+            db.metadata.create_all(bind=connection)
 
     return app
 
