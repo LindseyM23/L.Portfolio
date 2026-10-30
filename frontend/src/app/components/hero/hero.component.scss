@@ -48,7 +48,7 @@
 
 // ---------- Name ----------
 .name {
-  font-size: clamp(3rem, 11vw, 10rem);
+  font-size: clamp(2rem, 11vw, 10rem);
   font-weight: 800;
   line-height: 0.88;
   letter-spacing: -0.045em;
@@ -179,6 +179,27 @@
   max-width: 340px;
 }
 
+// Compact social pills on phones
+@media (max-width: $bp-mobile) {
+  .social-links { gap: 6px; }
+
+  .social-link {
+    gap: 6px;
+    padding: 4px 12px 4px 4px;
+
+    .social-icon {
+      width: 22px;
+      height: 22px;
+      padding: 3px;
+    }
+
+    .social-label {
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+  }
+}
+
 // ---------- Portrait ----------
 .hero-right {
   justify-self: end;
@@ -193,6 +214,10 @@
   position: relative;
   width: clamp(220px, 26vw, 340px);
   aspect-ratio: 4 / 5;
+
+  @media (max-width: $bp-mobile) {
+    width: min(72vw, 360px);
+  }
 }
 
 .profile-image,

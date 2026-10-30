@@ -3,11 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
 import { SocialLink, About } from '../../models/portfolio.models';
+import { ToastService } from '../../services/toast.service';
+import { ConfirmService } from '../../services/confirm.service';
+import { ModalComponent } from '../../shared/modal.component';
 
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalComponent],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'
 })
@@ -43,7 +46,11 @@ export class HeroComponent implements OnInit {
   private pauseAfterType = 2000; // pause before deleting
   private pauseAfterDelete = 500; // pause before typing next
 
-  constructor(private portfolioService: PortfolioService) {}
+  constructor(
+    private portfolioService: PortfolioService,
+    private toast: ToastService,
+    private confirm: ConfirmService
+  ) {}
 
   ngOnInit(): void {
     this.loadData();
@@ -106,33 +113,49 @@ export class HeroComponent implements OnInit {
 
   onImageUpload(event: any): void {
     const file = event.target.files[0];
-    if (file) {
-      this.uploadingImage = true;
-      this.portfolioService.uploadFile(file).subscribe({
-        next: (response) => {
-          this.about.profile_image = `http://localhost:5001${response.url}`;
-          this.saveAbout();
-          this.uploadingImage = false;
-        },
-        error: () => {
-          this.uploadingImage = false;
-          alert('Failed to upload image');
-        }
-      });
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.toast.error('Unsupported file', 'Please choose an image file.');
+      return;
     }
+    this.uploadingImage = true;
+    this.portfolioService.uploadFile(file).subscribe({
+      next: (response) => {
+        this.about.profile_image = `http://localhost:5001${response.url}`;
+        this.saveAbout();
+        this.uploadingImage = false;
+      },
+      error: err => {
+        this.uploadingImage = false;
+        this.toast.apiError(err, 'Could not upload photo');
+      }
+    });
   }
 
   saveAbout(): void {
-    this.portfolioService.updateAbout(this.about).subscribe(() => {
-      this.editingAbout = false;
+    this.portfolioService.updateAbout(this.about).subscribe({
+      next: () => {
+        this.editingAbout = false;
+        this.toast.success('Photo updated');
+      },
+      error: err => this.toast.apiError(err, 'Could not save photo')
     });
   }
 
   addLink(): void {
-    this.portfolioService.createSocialLink(this.newLink).subscribe(() => {
-      this.loadData();
-      this.addingLink = false;
-      this.newLink = { platform: '', url: '', order: 0 };
+    if (!this.toast.require({ Platform: this.newLink.platform, URL: this.newLink.url })) return;
+    if (!/^(https?:\/\/|mailto:)/i.test(this.newLink.url.trim())) {
+      this.toast.error('Check the URL', 'Links should start with https:// (or mailto: for email).');
+      return;
+    }
+    this.portfolioService.createSocialLink(this.newLink).subscribe({
+      next: () => {
+        this.loadData();
+        this.addingLink = false;
+        this.newLink = { platform: '', url: '', order: 0 };
+        this.toast.success('Social link added');
+      },
+      error: err => this.toast.apiError(err, 'Could not add social link')
     });
   }
 
@@ -145,12 +168,15 @@ export class HeroComponent implements OnInit {
     }
   }
 
-  deleteLink(id: number): void {
-    if (confirm('Delete this social link?')) {
-      this.portfolioService.deleteSocialLink(id).subscribe(() => {
+  async deleteLink(id: number): Promise<void> {
+    if (!(await this.confirm.delete('social link', this.socialLinks.find(l => l.id === id)?.platform))) return;
+    this.portfolioService.deleteSocialLink(id).subscribe({
+      next: () => {
         this.loadData();
-      });
-    }
+        this.toast.success('Social link deleted');
+      },
+      error: err => this.toast.apiError(err, 'Could not delete social link')
+    });
   }
 
   getPlatformIcon(platform: string): string {

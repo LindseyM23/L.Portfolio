@@ -3,12 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
 import { RevealDirective } from '../../shared/reveal.directive';
+import { ModalComponent } from '../../shared/modal.component';
 import { About, Skill } from '../../models/portfolio.models';
+import { ToastService } from '../../services/toast.service';
+import { ConfirmService } from '../../services/confirm.service';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, FormsModule, RevealDirective],
+  imports: [CommonModule, FormsModule, RevealDirective, ModalComponent],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss'
 })
@@ -17,6 +20,7 @@ export class AboutComponent implements OnInit {
   about: About = { overview: '' };
   skills: Skill[] = [];
   editingAbout = false;
+  overviewDraft = '';
   addingSkill = false;
   editingSkill: number | null = null;
   newSkill: Skill = { name: '', order: 0 };
@@ -35,7 +39,11 @@ export class AboutComponent implements OnInit {
     { label: 'Core skills', value: 0, suffix: '' }
   ];
 
-  constructor(private portfolioService: PortfolioService) {}
+  constructor(
+    private portfolioService: PortfolioService,
+    private toast: ToastService,
+    private confirm: ConfirmService
+  ) {}
 
   ngOnInit(): void {
     this.loadData();
@@ -68,14 +76,27 @@ export class AboutComponent implements OnInit {
     this.atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
   }
 
-  saveAbout(): void {
-    this.portfolioService.updateAbout(this.about).subscribe(() => {
-      this.editingAbout = false;
-      this.loadData();
+  startEditAbout(): void {
+    this.overviewDraft = this.about.overview ?? '';
+    this.editingAbout = true;
+  }
+
+  saveOverview(): void {
+    if (!this.toast.require({ Overview: this.overviewDraft })) return;
+    this.portfolioService.updateAbout({ ...this.about, overview: this.overviewDraft }).subscribe({
+      next: () => {
+        this.editingAbout = false;
+        this.loadData();
+        this.toast.success('Overview updated');
+      },
+      error: err => this.toast.apiError(err, 'Could not update overview')
     });
   }
 
+
+
   addSkill(): void {
+    if (!this.toast.require({ 'Skill name': this.newSkill.name })) return;
     // If there's an icon file, upload it first
     if (this.skillIconFile) {
       this.portfolioService.uploadFile(this.skillIconFile).subscribe({
@@ -83,9 +104,7 @@ export class AboutComponent implements OnInit {
           this.newSkill.icon = `http://localhost:5001${response.url}`;
           this.createSkill();
         },
-        error: () => {
-          alert('Failed to upload icon');
-        }
+        error: err => this.toast.apiError(err, 'Could not upload icon')
       });
     } else {
       this.createSkill();
@@ -93,9 +112,13 @@ export class AboutComponent implements OnInit {
   }
 
   private createSkill(): void {
-    this.portfolioService.createSkill(this.newSkill).subscribe(() => {
-      this.loadData();
-      this.cancelAddSkill();
+    this.portfolioService.createSkill(this.newSkill).subscribe({
+      next: () => {
+        this.loadData();
+        this.cancelAddSkill();
+        this.toast.success('Skill added');
+      },
+      error: err => this.toast.apiError(err, 'Could not add skill')
     });
   }
 
@@ -115,7 +138,7 @@ export class AboutComponent implements OnInit {
         };
         reader.readAsDataURL(file);
       } else {
-        alert('Please select an SVG file');
+        this.toast.error('Unsupported file', 'Skill icons must be SVG files.');
       }
     }
   }
@@ -138,12 +161,15 @@ export class AboutComponent implements OnInit {
   }
 
   saveSkillEdit(): void {
-    if (this.editingSkill && this.editSkillData.name.trim()) {
-      this.portfolioService.updateSkill(this.editingSkill, this.editSkillData).subscribe(() => {
+    if (!this.editingSkill || !this.toast.require({ 'Skill name': this.editSkillData.name })) return;
+    this.portfolioService.updateSkill(this.editingSkill, this.editSkillData).subscribe({
+      next: () => {
         this.loadData();
         this.cancelEditSkill();
-      });
-    }
+        this.toast.success('Skill updated');
+      },
+      error: err => this.toast.apiError(err, 'Could not update skill')
+    });
   }
 
   cancelEditSkill(): void {
@@ -151,9 +177,14 @@ export class AboutComponent implements OnInit {
     this.editSkillData = { name: '', order: 0 };
   }
 
-  deleteSkill(id: number): void {
-    if (confirm('Delete this skill?')) {
-      this.portfolioService.deleteSkill(id).subscribe(() => this.loadData());
-    }
+  async deleteSkill(id: number): Promise<void> {
+    if (!(await this.confirm.delete('skill', this.skills.find(sk => sk.id === id)?.name))) return;
+    this.portfolioService.deleteSkill(id).subscribe({
+      next: () => {
+        this.loadData();
+        this.toast.success('Skill deleted');
+      },
+      error: err => this.toast.apiError(err, 'Could not delete skill')
+    });
   }
 }

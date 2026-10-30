@@ -4,12 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PortfolioService } from '../../services/portfolio.service';
 import { WorkExperience } from '../../models/portfolio.models';
+import { ToastService } from '../../services/toast.service';
+import { ConfirmService } from '../../services/confirm.service';
 import { RevealDirective } from '../../shared/reveal.directive';
+import { ModalComponent } from '../../shared/modal.component';
 
 @Component({
   selector: 'app-experience',
   standalone: true,
-  imports: [CommonModule, FormsModule, RevealDirective],
+  imports: [CommonModule, FormsModule, RevealDirective, ModalComponent],
   template: `
     <section class="experience-section dark">
       <div class="container head-container">
@@ -49,7 +52,7 @@ import { RevealDirective } from '../../shared/reveal.directive';
             <div class="node"><span></span></div>
 
             <article class="card">
-              <ng-container *ngIf="editingExp !== exp.id">
+              <ng-container>
                 <div class="card-top mono">
                   <span>{{ formatDate(exp.start_date) }} &mdash; {{ exp.end_date ? formatDate(exp.end_date) : 'Present' }}</span>
                   <span class="duration">{{ duration(exp) }}</span>
@@ -68,19 +71,6 @@ import { RevealDirective } from '../../shared/reveal.directive';
                   <button class="btn-ghost" (click)="deleteExp(exp.id!)">Delete</button>
                 </div>
               </ng-container>
-
-              <div *ngIf="editingExp === exp.id" class="edit-form-inline">
-                <h4 class="mono">Edit experience</h4>
-                <input [(ngModel)]="editExpData.company" placeholder="Company" />
-                <input [(ngModel)]="editExpData.role" placeholder="Role" />
-                <input [(ngModel)]="editExpData.start_date" type="date" />
-                <input [(ngModel)]="editExpData.end_date" type="date" placeholder="End Date (leave empty if current)" />
-                <textarea [(ngModel)]="editExpData.summary" placeholder="Summary" rows="4"></textarea>
-                <div class="btn-row">
-                  <button (click)="saveEditExp()">Save</button>
-                  <button class="btn-ghost" (click)="cancelEditExp()">Cancel</button>
-                </div>
-              </div>
             </article>
           </div>
 
@@ -98,22 +88,35 @@ import { RevealDirective } from '../../shared/reveal.directive';
       <div class="container foot-container">
         <div class="progress"><span [style.transform]="'scaleX(' + progress + ')'"></span></div>
 
-        <div *ngIf="isAdmin && !adding" class="add-tile" (click)="adding = true">+ Add experience</div>
-
-        <div *ngIf="adding" class="admin-form">
-          <h3>Add experience</h3>
-          <input [(ngModel)]="newExp.company" placeholder="Company" />
-          <input [(ngModel)]="newExp.role" placeholder="Role" />
-          <input [(ngModel)]="newExp.start_date" type="date" placeholder="Start Date" />
-          <input [(ngModel)]="newExp.end_date" type="date" placeholder="End Date (leave empty if current)" />
-          <textarea [(ngModel)]="newExp.summary" placeholder="Summary" rows="4"></textarea>
-          <div class="btn-row">
-            <button (click)="addExp()">Add</button>
-            <button class="btn-ghost" (click)="cancelAdd()">Cancel</button>
-          </div>
-        </div>
+        <div *ngIf="isAdmin" class="add-tile" (click)="adding = true">+ Add experience</div>
       </div>
     </section>
+
+    <app-modal [open]="editingExp !== null" title="Edit experience" kicker="Work experience" (closed)="cancelEditExp()">
+      <div class="field-row">
+        <label class="field"><span>Role</span><input [(ngModel)]="editExpData.role" /></label>
+        <label class="field"><span>Company</span><input [(ngModel)]="editExpData.company" /></label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>Start date</span><input [(ngModel)]="editExpData.start_date" type="date" /></label>
+        <label class="field"><span>End date</span><input [(ngModel)]="editExpData.end_date" type="date" /><small class="hint">Leave empty if this is your current role</small></label>
+      </div>
+      <label class="field"><span>Summary</span><textarea [(ngModel)]="editExpData.summary" rows="6"></textarea></label>
+      <ng-container modal-actions><button (click)="saveEditExp()">Save changes</button></ng-container>
+    </app-modal>
+
+    <app-modal [open]="adding" title="Add experience" kicker="Work experience" (closed)="cancelAdd()">
+      <div class="field-row">
+        <label class="field"><span>Role</span><input [(ngModel)]="newExp.role" placeholder="e.g. Software Engineer" /></label>
+        <label class="field"><span>Company</span><input [(ngModel)]="newExp.company" /></label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>Start date</span><input [(ngModel)]="newExp.start_date" type="date" /></label>
+        <label class="field"><span>End date</span><input [(ngModel)]="newExp.end_date" type="date" /><small class="hint">Leave empty if this is your current role</small></label>
+      </div>
+      <label class="field"><span>Summary</span><textarea [(ngModel)]="newExp.summary" rows="6"></textarea></label>
+      <ng-container modal-actions><button (click)="addExp()">Add experience</button></ng-container>
+    </app-modal>
   `,
   styles: [`
     @import '../../../theme.scss';
@@ -277,8 +280,6 @@ import { RevealDirective } from '../../shared/reveal.directive';
     .next-card p { font-family: $font-display; font-size: 2.25rem; font-weight: 700; line-height: 1.05; }
     .next-card a { font-size: 11px; border-bottom: 1px solid var(--fg); padding-bottom: 4px; width: fit-content; }
 
-    .edit-form-inline { display: flex; flex-direction: column; gap: $spacing-xs; user-select: text; }
-
     // ---------- Progress ----------
     .foot-container { padding-top: 0; }
     .progress { height: 2px; background: var(--line); overflow: hidden; }
@@ -300,9 +301,20 @@ import { RevealDirective } from '../../shared/reveal.directive';
     @media (max-width: $bp-mobile) {
       .head-container .section-head { padding-right: 0; }
       .controls { position: static; margin-bottom: $spacing-md; justify-content: flex-end; }
-      .year { height: 72px; font-size: 4rem; }
-      .rail::before { top: calc(#{$spacing-lg} + 80px); }
-      .stop { width: 82vw; }
+      .rail { padding-top: $spacing-md; padding-bottom: $spacing-lg; }
+      .year { height: 52px; font-size: 3rem; }
+      .rail::before { top: calc(#{$spacing-md} + 60px); }
+      .stop { width: min(78vw, 340px); }
+      .end-cap { width: min(60vw, 240px); }
+      .node { margin-bottom: $spacing-sm; }
+      .node::before { height: $spacing-sm; }
+      .card, .next-card { min-height: 0; padding: $spacing-md; }
+      .card-top { flex-direction: column; gap: 2px; font-size: 10px; margin-bottom: $spacing-sm; }
+      .card h3 { font-size: 1.2rem; }
+      .company { font-size: 1.05rem; margin-bottom: $spacing-sm; }
+      .summary { font-size: 13.5px; -webkit-line-clamp: 4; margin-bottom: $spacing-sm; }
+      .next-card p { font-size: 1.6rem; margin-bottom: $spacing-lg; }
+      .nav-btn { width: 44px; height: 44px; font-size: 18px; }
     }
   `]
 })
@@ -325,7 +337,9 @@ export class ExperienceComponent implements OnInit {
 
   constructor(
     private portfolioService: PortfolioService,
-    private router: Router
+    private router: Router,
+    private toast: ToastService,
+    private confirm: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -418,10 +432,24 @@ export class ExperienceComponent implements OnInit {
   }
 
   addExp(): void {
-    this.portfolioService.createExperience(this.newExp).subscribe(() => {
-      this.loadExperiences();
-      this.cancelAdd();
+    if (!this.validExp(this.newExp)) return;
+    this.portfolioService.createExperience(this.newExp).subscribe({
+      next: () => {
+        this.loadExperiences();
+        this.cancelAdd();
+        this.toast.success('Experience added');
+      },
+      error: err => this.toast.apiError(err, 'Could not add experience')
     });
+  }
+
+  private validExp(exp: WorkExperience): boolean {
+    if (!this.toast.require({ Role: exp.role, Company: exp.company, 'Start date': exp.start_date })) return false;
+    if (exp.end_date && exp.end_date < exp.start_date) {
+      this.toast.error('Check the dates', 'The end date can\'t be before the start date.');
+      return false;
+    }
+    return true;
   }
 
   cancelAdd(): void {
@@ -435,12 +463,15 @@ export class ExperienceComponent implements OnInit {
   }
 
   saveEditExp(): void {
-    if (this.editingExp && this.editExpData.company.trim() && this.editExpData.role.trim()) {
-      this.portfolioService.updateExperience(this.editingExp, this.editExpData).subscribe(() => {
+    if (!this.editingExp || !this.validExp(this.editExpData)) return;
+    this.portfolioService.updateExperience(this.editingExp, this.editExpData).subscribe({
+      next: () => {
         this.loadExperiences();
         this.cancelEditExp();
-      });
-    }
+        this.toast.success('Experience updated');
+      },
+      error: err => this.toast.apiError(err, 'Could not update experience')
+    });
   }
 
   cancelEditExp(): void {
@@ -448,9 +479,15 @@ export class ExperienceComponent implements OnInit {
     this.editExpData = { company: '', role: '', start_date: '', order: 0 };
   }
 
-  deleteExp(id: number): void {
-    if (confirm('Delete this experience?')) {
-      this.portfolioService.deleteExperience(id).subscribe(() => this.loadExperiences());
-    }
+  async deleteExp(id: number): Promise<void> {
+    const exp = this.experiences.find(e => e.id === id);
+    if (!(await this.confirm.delete('experience', exp && `${exp.role} at ${exp.company}`))) return;
+    this.portfolioService.deleteExperience(id).subscribe({
+      next: () => {
+        this.loadExperiences();
+        this.toast.success('Experience deleted');
+      },
+      error: err => this.toast.apiError(err, 'Could not delete experience')
+    });
   }
 }

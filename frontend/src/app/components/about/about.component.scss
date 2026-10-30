@@ -272,6 +272,23 @@
   img { width: 32px; height: 32px; }
 }
 
+@media (max-width: $bp-mobile) {
+  .skills-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .skill-tile {
+    gap: 8px;
+    padding: $spacing-sm 6px;
+
+    .skill-num { top: 8px; left: 8px; font-size: 9px; }
+    .skill-icon { width: 34px; height: 34px; }
+    .skill-name { font-size: 9px; letter-spacing: 0.06em; text-align: center; }
+  }
+
+  .toolkit-head h3 { font-size: 1.6rem; }
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
