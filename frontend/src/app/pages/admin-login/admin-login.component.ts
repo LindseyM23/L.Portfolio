@@ -37,7 +37,9 @@ export class AdminLoginComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.error = 'Invalid password';
+        if (err.status === 401) this.error = 'Invalid password';
+        else if (err.status === 0) this.error = 'Could not reach the server. It may be waking up, so please try again in a minute.';
+        else this.error = err.error?.error || 'Login failed. Please try again.';
       }
     });
   }
