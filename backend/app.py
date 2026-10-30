@@ -28,7 +28,8 @@ def create_app(config_class=None):
 
     @app.before_request
     def enforce_https():
-        if app.config['FORCE_HTTPS'] and not request.is_secure:
+        # The health check ("/") comes from the host's internal network over plain http
+        if app.config['FORCE_HTTPS'] and not request.is_secure and request.path != '/':
             return redirect(request.url.replace('http://', 'https://', 1), code=301)
 
     @app.after_request
