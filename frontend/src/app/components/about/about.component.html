@@ -44,7 +44,7 @@
         <div *ngFor="let skill of skills; let i = index" class="skill-tile" appReveal [revealDelay]="(i % 4) * 0.06">
           <ng-container>
             <span class="skill-num mono">{{ (i + 1).toString().padStart(2, '0') }}</span>
-            <img *ngIf="skill.icon" [src]="skill.icon" [alt]="skill.name" class="skill-icon" />
+            <img *ngIf="skill.icon" [src]="skill.icon | mediaUrl" [alt]="skill.name" class="skill-icon" />
             <span class="skill-name">{{ skill.name }}</span>
           </ng-container>
 

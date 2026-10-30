@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MediaUrlPipe } from './media-url.pipe';
 import { forkJoin } from 'rxjs';
 import { PortfolioService } from '../services/portfolio.service';
 import { ToastService } from '../services/toast.service';
@@ -12,12 +13,12 @@ import { ToastService } from '../services/toast.service';
 @Component({
   selector: 'app-image-manager',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MediaUrlPipe],
   template: `
     <label>Slideshow images <span class="hint">(first image is the cover)</span></label>
     <div class="thumbs">
       <figure *ngFor="let src of images; let i = index; let first = first; let last = last" class="thumb">
-        <img [src]="src" [alt]="'Image ' + (i + 1)" />
+        <img [src]="src | mediaUrl" [alt]="'Image ' + (i + 1)" />
         <span class="num">{{ i + 1 }}</span>
         <div class="thumb-actions">
           <button type="button" (click)="move(i, -1)" [disabled]="first" aria-label="Move left">&#x2190;</button>
@@ -86,7 +87,7 @@ export class ImageManagerComponent {
     this.uploading = true;
     forkJoin(files.map(file => this.portfolioService.uploadFile(file))).subscribe({
       next: responses => {
-        this.emit([...this.images, ...responses.map(r => `http://localhost:5001${r.url}`)]);
+        this.emit([...this.images, ...responses.map(r => r.url)]);
         this.uploading = false;
         this.toast.info(`${files.length} image${files.length > 1 ? 's' : ''} uploaded`, 'Remember to save to keep them.');
       },

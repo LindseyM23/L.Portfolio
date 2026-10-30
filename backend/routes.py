@@ -1,10 +1,15 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, Response
 from werkzeug.utils import secure_filename
-from models import db, SocialLink, About, Skill, Service, Certification, WorkExperience, ExperienceSkill, Project, KPI, Contact
+from models import db, Media, SocialLink, About, Skill, Service, Certification, WorkExperience, ExperienceSkill, Project, KPI, Contact
 from datetime import datetime
+from collections import defaultdict, deque
+import hmac
 import jwt
 import json
 import os
+import re
+import secrets
+import time
 
 api_bp = Blueprint('api', __name__)
 
@@ -26,17 +31,38 @@ def handle_value_error(error):
     # e.g. malformed dates passed to datetime.fromisoformat
     return jsonify({'error': f'Invalid value: {error}'}), 400
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+# ---------- Uploads ----------
+
+# Signature checks: the file's real content must match an allowed image type,
+# whatever its extension or the browser-reported MIME type claims.
+def detect_image_type(data):
+    if data.startswith(b'\x89PNG\r\n\x1a\n'):
+        return 'image/png'
+    if data.startswith(b'\xff\xd8\xff'):
+        return 'image/jpeg'
+    if data[:6] in (b'GIF87a', b'GIF89a'):
+        return 'image/gif'
+    if data[:4] == b'RIFF' and data[8:12] == b'WEBP':
+        return 'image/webp'
+    head = data[:1024].lstrip().lower()
+    if head.startswith(b'<?xml') or head.startswith(b'<svg') or head.startswith(b'<!--'):
+        return 'image/svg+xml' if b'<svg' in data[:4096].lower() else None
+    return None
+
+# SVGs are XML and can carry scripts; reject anything active instead of trying to clean it
+UNSAFE_SVG = re.compile(
+    rb'<\s*(script|foreignobject|iframe|embed|object)\b|\bon[a-z]+\s*=|javascript:|data:text/html|<!entity',
+    re.IGNORECASE)
 
 def generate_token():
-    return jwt.encode({'admin': True, 'exp': datetime.utcnow().timestamp() + 86400}, current_app.config['SECRET_KEY'], algorithm='HS256')
+    lifetime = current_app.config['TOKEN_LIFETIME_HOURS'] * 3600
+    return jwt.encode({'admin': True, 'exp': int(time.time()) + lifetime}, current_app.config['SECRET_KEY'], algorithm='HS256')
 
 def verify_token(token):
     try:
         payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-        return payload.get('admin') == True
-    except:
+        return payload.get('admin') is True
+    except jwt.PyJWTError:
         return False
 
 def admin_required(f):
@@ -51,29 +77,68 @@ def admin_required(f):
     decorator.__name__ = f.__name__
     return decorator
 
+# Failed login attempts per client IP (in memory; resets when the server restarts)
+LOGIN_WINDOW_SECONDS = 15 * 60
+LOGIN_MAX_FAILURES = 5
+_failed_logins = defaultdict(deque)
+
 @api_bp.route('/auth/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    if data.get('password') == current_app.config['ADMIN_PASSWORD']:
+    ip = request.remote_addr or 'unknown'
+    attempts = _failed_logins[ip]
+    now = time.time()
+    while attempts and now - attempts[0] > LOGIN_WINDOW_SECONDS:
+        attempts.popleft()
+    if len(attempts) >= LOGIN_MAX_FAILURES:
+        retry_in = int(LOGIN_WINDOW_SECONDS - (now - attempts[0])) // 60 + 1
+        return jsonify({'error': f'Too many failed attempts. Try again in {retry_in} minutes.'}), 429
+
+    data = request.get_json(silent=True) or {}
+    password = str(data.get('password') or '')
+    expected = current_app.config['ADMIN_PASSWORD'] or ''
+    if expected and hmac.compare_digest(password.encode(), expected.encode()):
+        attempts.clear()
         return jsonify({'token': generate_token(), 'message': 'Login successful'}), 200
+    attempts.append(now)
     return jsonify({'error': 'Invalid password'}), 401
 
 @api_bp.route('/upload', methods=['POST'])
 @admin_required
 def upload_file():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        name, ext = os.path.splitext(filename)
-        filename = f"{name}_{int(datetime.utcnow().timestamp())}{ext}"
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-        return jsonify({'url': f"/uploads/{filename}"}), 200
-    return jsonify({'error': 'File type not allowed'}), 400
+    file = request.files.get('file')
+    if not file or not file.filename:
+        return jsonify({'error': 'No file selected'}), 400
+    data = file.read()
+    if not data:
+        return jsonify({'error': 'The file is empty'}), 400
+    if len(data) > current_app.config['MAX_UPLOAD_BYTES']:
+        limit_mb = current_app.config['MAX_UPLOAD_BYTES'] // (1024 * 1024)
+        return jsonify({'error': f'Images must be {limit_mb} MB or smaller'}), 400
+    content_type = detect_image_type(data)
+    if not content_type:
+        return jsonify({'error': 'Only PNG, JPG, GIF, WebP or SVG images are allowed'}), 400
+    if content_type == 'image/svg+xml' and UNSAFE_SVG.search(data):
+        return jsonify({'error': 'This SVG contains scripts or embedded content and was rejected'}), 400
+
+    media = Media(id=secrets.token_hex(16), filename=secure_filename(file.filename) or 'upload',
+                  content_type=content_type, size=len(data), data=data)
+    db.session.add(media)
+    db.session.commit()
+    return jsonify({'url': f'/api/media/{media.id}'}), 201
+
+@api_bp.route('/media/<media_id>', methods=['GET'])
+def get_media(media_id):
+    if not re.fullmatch(r'[0-9a-f]{32}', media_id):
+        return jsonify({'error': 'Not found'}), 404
+    media = Media.query.get_or_404(media_id)
+    response = Response(media.data, mimetype=media.content_type)
+    # Content never changes for a given id, so it can be cached forever
+    response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+    response.headers['Content-Disposition'] = f'inline; filename="{media.filename}"'
+    # Even if opened directly, an image can't run scripts or load anything
+    response.headers['Content-Security-Policy'] = "default-src 'none'; style-src 'unsafe-inline'; sandbox"
+    response.headers['Cross-Origin-Resource-Policy'] = 'cross-origin'
+    return response
 
 @api_bp.route('/social-links', methods=['GET'])
 def get_social_links():
