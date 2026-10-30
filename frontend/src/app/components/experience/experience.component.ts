@@ -302,7 +302,7 @@ import { RevealDirective } from '../../shared/reveal.directive';
       .controls { position: static; margin-bottom: $spacing-md; justify-content: flex-end; }
       .year { height: 72px; font-size: 4rem; }
       .rail::before { top: calc(#{$spacing-lg} + 80px); }
-      .stop { width: 82vw; }
+      .stop { width: min(82vw, 420px); }
     }
   `]
 })

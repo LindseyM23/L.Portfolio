@@ -155,7 +155,7 @@ import { RevealDirective } from '../../shared/reveal.directive';
     .top-link:hover { text-decoration: underline; text-underline-offset: 4px; }
     .wordmark {
       font-family: $font-display;
-      font-size: clamp(3rem, 11.2vw, 10rem);
+      font-size: clamp(2rem, 11.2vw, 10rem);
       font-weight: 800;
       line-height: 0.8;
       letter-spacing: -0.06em;
