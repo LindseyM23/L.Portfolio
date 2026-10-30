@@ -6,9 +6,11 @@ load_dotenv()
 
 def _database_url():
     url = os.environ.get('DATABASE_URL') or 'sqlite:///portfolio.db'
-    # Some hosts hand out "postgres://", which SQLAlchemy no longer accepts
-    if url.startswith('postgres://'):
-        url = url.replace('postgres://', 'postgresql://', 1)
+    # Hosts hand out "postgres://" or "postgresql://"; name the installed
+    # psycopg2 driver explicitly (newer SQLAlchemy defaults to psycopg 3)
+    for prefix in ('postgres://', 'postgresql://'):
+        if url.startswith(prefix):
+            url = 'postgresql+psycopg2://' + url[len(prefix):]
     return url
 
 
