@@ -81,6 +81,7 @@ class Project(db.Model):
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)
     image = db.Column(db.String(255))
+    images = db.Column(db.Text)  # JSON list of image URLs for the slideshow
     live_url = db.Column(db.String(255))
     github_url = db.Column(db.String(255))
     technologies = db.Column(db.Text)  # JSON string or comma-separated

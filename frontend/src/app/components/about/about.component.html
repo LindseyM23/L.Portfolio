@@ -1,82 +1,107 @@
 <section class="about-section">
   <div class="container">
-    <h2 class="section-title">About Me</h2>
+    <header class="section-head" appReveal>
+      <span class="section-index">(01)</span>
+      <h2 class="section-title">About <em>me</em></h2>
+    </header>
 
     <div class="about-grid">
-      <div class="about-left">
-        <div class="overview" *ngIf="!editingAbout">
-          <p>{{ about.overview || 'No overview yet.' }}</p>
-          <button *ngIf="isAdmin" (click)="editingAbout = true" class="edit-btn">
-            <img src="/assets/icons/edit.svg" alt="Edit" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px; filter: brightness(0) invert(1);" />
+      <aside class="about-aside" appReveal>
+        <p class="mono">Who I am</p>
+        <span class="asterisk" aria-hidden="true">&#x2733;</span>
+      </aside>
+
+      <div class="about-main">
+        <div class="overview" *ngIf="!editingAbout" appReveal>
+          <div class="statement-wrap" [class.fade-top]="!atTop" [class.fade-bottom]="!atBottom">
+            <p class="statement" #statement (scroll)="updateScrollState()">{{ about.overview || 'No overview yet.' }}</p>
+          </div>
+          <p *ngIf="scrollable" class="scroll-hint mono">
+            <span class="hint-line"></span>{{ atBottom ? 'End' : 'Scroll to read more' }}
+          </p>
+          <button *ngIf="isAdmin" (click)="editingAbout = true" class="btn-sm">
+            <img src="assets/icons/edit.svg" alt="" class="ico" />
             Edit
           </button>
         </div>
 
         <div *ngIf="editingAbout" class="edit-form">
-          <textarea [(ngModel)]="about.overview" rows="8" maxlength="500"></textarea>
-          <div class="char-counter">{{ about.overview.length || 0 }}/500 characters</div>
-          <div class="btn-group">
+          <textarea [(ngModel)]="about.overview" rows="12" maxlength="1000"></textarea>
+          <div class="char-counter mono">{{ about.overview.length || 0 }}/1000</div>
+          <div class="btn-row">
             <button (click)="saveAbout()">Save</button>
-            <button (click)="editingAbout = false">Cancel</button>
+            <button class="btn-ghost" (click)="editingAbout = false">Cancel</button>
           </div>
+        </div>
+
+        <dl class="stats">
+          <div *ngFor="let stat of stats; let i = index" class="stat" appReveal [revealDelay]="i * 0.08">
+            <dt class="mono">{{ stat.label }}</dt>
+            <dd>{{ stat.value }}<span>{{ stat.suffix }}</span></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="toolkit">
+      <div class="toolkit-head" appReveal>
+        <h3>The <em>toolkit</em></h3>
+        <span class="mono">{{ skills.length }} technologies</span>
+      </div>
+
+      <div class="skills-grid">
+        <div *ngFor="let skill of skills; let i = index" class="skill-tile" appReveal [revealDelay]="(i % 4) * 0.06">
+          <ng-container *ngIf="editingSkill !== skill.id">
+            <span class="skill-num mono">{{ (i + 1).toString().padStart(2, '0') }}</span>
+            <img *ngIf="skill.icon" [src]="skill.icon" [alt]="skill.name" class="skill-icon" />
+            <span class="skill-name">{{ skill.name }}</span>
+          </ng-container>
+
+          <div *ngIf="isAdmin && editingSkill !== skill.id" class="skill-actions">
+            <button class="icon-btn" (click)="startEditSkill(skill)" aria-label="Edit skill">
+              <img src="assets/icons/edit.svg" alt="" class="ico" />
+            </button>
+            <button class="icon-btn danger" (click)="deleteSkill(skill.id!)" aria-label="Delete skill">✕</button>
+          </div>
+
+          <div *ngIf="editingSkill === skill.id" class="edit-skill-inline">
+            <input [(ngModel)]="editSkillData.name" placeholder="Skill name" />
+            <div class="btn-row">
+              <button (click)="saveSkillEdit()" class="btn-sm">Save</button>
+              <button (click)="cancelEditSkill()" class="btn-sm btn-ghost">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="isAdmin && !addingSkill" class="add-tile" (click)="addingSkill = true">
+          <span>+ Add skill</span>
         </div>
       </div>
 
-      <div class="about-right">
-        <div class="skills-grid">
-          <div *ngFor="let skill of skills" class="skill-badge">
-            <div *ngIf="editingSkill !== skill.id" class="skill-display">
-              <img *ngIf="skill.icon" [src]="skill.icon" alt="{{ skill.name }}" class="skill-icon" />
-              <span *ngIf="!skill.icon">{{ skill.name }}</span>
-            </div>
-            
-            <div *ngIf="isAdmin && editingSkill !== skill.id" class="skill-actions">
-              <button class="edit-skill-btn" (click)="startEditSkill(skill)">
-                <img src="/assets/icons/edit.svg" alt="Edit" style="width: 12px; height: 12px; filter: brightness(0) invert(1);" />
-              </button>
-              <button class="delete-badge" (click)="deleteSkill(skill.id!)">✕</button>
-            </div>
+      <div *ngIf="addingSkill" class="admin-form">
+        <h4>Add skill</h4>
+        <input [(ngModel)]="newSkill.name" placeholder="Skill name" />
 
-            <div *ngIf="editingSkill === skill.id" class="edit-skill-inline">
-              <input [(ngModel)]="editSkillData.name" placeholder="Skill name" />
-              <div class="skill-edit-actions">
-                <button (click)="saveSkillEdit()" class="save-btn">Save</button>
-                <button (click)="cancelEditSkill()" class="cancel-btn">Cancel</button>
-              </div>
-            </div>
-          </div>
-
-          <button *ngIf="isAdmin && !addingSkill" class="add-skill-btn" (click)="addingSkill = true">
-            + Add Skill
+        <label>Icon (optional)</label>
+        <div class="icon-options">
+          <input type="file"
+                 #skillIconInput
+                 (change)="onSkillIconUpload($event)"
+                 accept=".svg,image/svg+xml"
+                 hidden />
+          <button type="button" (click)="skillIconInput.click()" class="btn-sm">
+            <img src="assets/icons/camera.svg" alt="" class="ico" />
+            Upload SVG
           </button>
+          <span *ngIf="skillIconPreview" class="icon-preview">
+            <img [src]="skillIconPreview" alt="Preview" />
+            <button type="button" (click)="clearSkillIcon()" class="icon-btn danger">✕</button>
+          </span>
         </div>
 
-        <div *ngIf="addingSkill" class="add-skill-form">
-          <input [(ngModel)]="newSkill.name" placeholder="Skill name" />
-          
-          <div class="icon-input-group">
-            <label>Icon (optional):</label>
-            <div class="icon-options">
-              <input type="file" 
-                     #skillIconInput 
-                     (change)="onSkillIconUpload($event)" 
-                     accept=".svg,image/svg+xml" 
-                     style="display: none;" />
-              <button type="button" (click)="skillIconInput.click()" class="upload-icon-btn">
-                <img src="/assets/icons/camera.svg" alt="Upload" style="width: 16px; height: 16px; filter: brightness(0) invert(1);" />
-                Upload SVG
-              </button>
-              <span *ngIf="skillIconPreview" class="icon-preview">
-                <img [src]="skillIconPreview" alt="Preview" style="width: 24px; height: 24px;" />
-                <button type="button" (click)="clearSkillIcon()" class="clear-icon">✕</button>
-              </span>
-            </div>
-          </div>
-
-          <div class="btn-group">
-            <button (click)="addSkill()">Add</button>
-            <button (click)="cancelAddSkill()">Cancel</button>
-          </div>
+        <div class="btn-row">
+          <button (click)="addSkill()">Add</button>
+          <button class="btn-ghost" (click)="cancelAddSkill()">Cancel</button>
         </div>
       </div>
     </div>

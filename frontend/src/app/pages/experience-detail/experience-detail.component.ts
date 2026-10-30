@@ -11,70 +11,120 @@ import { WorkExperience, ExperienceSkill } from '../../models/portfolio.models';
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="detail-page">
-      <div class="container">
-        <a routerLink="/" class="back-link">← Back to Portfolio</a>
-        
-        <div *ngIf="experience" class="experience-detail card">
-          <h1>{{ experience.role }}</h1>
-          <h2>{{ experience.company }}</h2>
-          <p class="period">{{ formatDate(experience.start_date) }} - {{ experience.end_date ? formatDate(experience.end_date) : 'Present' }}</p>
+      <div class="hero-band dark">
+        <div class="container">
+          <a routerLink="/" fragment="experience" class="back-link mono">&larr; Back to portfolio</a>
+
+          <ng-container *ngIf="experience">
+            <p class="mono period">
+              {{ formatDate(experience.start_date) }} &mdash; {{ experience.end_date ? formatDate(experience.end_date) : 'Present' }}
+            </p>
+            <h1>{{ experience.role }}</h1>
+            <p class="company"><em>{{ experience.company }}</em></p>
+          </ng-container>
+        </div>
+      </div>
+
+      <div *ngIf="experience" class="container body">
+        <div class="summary-grid">
+          <span class="mono label">(01) Overview</span>
           <p class="summary">{{ experience.summary }}</p>
+        </div>
 
-          <div class="skills-section">
-            <h3>Skills Acquired</h3>
-            <div class="skills-grid">
-              <div *ngFor="let skill of experience.skills_acquired" class="skill-chip" (click)="showExplanation(skill)">
-                <span>{{ skill.skill_name }}</span>
-                <button *ngIf="isAdmin" class="delete-skill" (click)="deleteSkill(skill.id!); $event.stopPropagation()">✕</button>
+        <div class="skills-section">
+          <div class="summary-grid">
+            <span class="mono label">(02) Skills acquired</span>
+            <div>
+              <p class="hint mono" *ngIf="experience.skills_acquired?.length">Select a skill to read the story behind it</p>
+              <div class="skills-grid">
+                <button *ngFor="let skill of experience.skills_acquired" class="skill-chip btn-ghost" (click)="showExplanation(skill)">
+                  {{ skill.skill_name }}
+                  <span *ngIf="isAdmin" class="delete-skill" (click)="deleteSkill(skill.id!); $event.stopPropagation()">✕</span>
+                </button>
+
+                <button *ngIf="isAdmin && !addingSkill" class="add-skill-chip btn-ghost" (click)="addingSkill = true">
+                  + Add skill
+                </button>
               </div>
-
-              <button *ngIf="isAdmin && !addingSkill" class="add-skill-chip" (click)="addingSkill = true">
-                + Add Skill
-              </button>
+              <p *ngIf="!experience.skills_acquired?.length && !isAdmin" class="empty">More detail coming soon.</p>
             </div>
+          </div>
 
-            <div *ngIf="addingSkill" class="add-skill-form">
-              <input [(ngModel)]="newSkill.skill_name" placeholder="Skill Name" />
-              <textarea [(ngModel)]="newSkill.explanation" placeholder="What did you do to acquire this skill?" rows="4"></textarea>
+          <div *ngIf="addingSkill" class="admin-form">
+            <h4>Add skill</h4>
+            <input [(ngModel)]="newSkill.skill_name" placeholder="Skill Name" />
+            <textarea [(ngModel)]="newSkill.explanation" placeholder="What did you do to acquire this skill?" rows="4"></textarea>
+            <div class="btn-row">
               <button (click)="addSkill()">Add</button>
-              <button (click)="cancelAddSkill()">Cancel</button>
+              <button class="btn-ghost" (click)="cancelAddSkill()">Cancel</button>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div *ngIf="selectedSkill" class="skill-explanation-modal" (click)="selectedSkill = null">
-            <div class="modal-content" (click)="$event.stopPropagation()">
-              <h3>{{ selectedSkill.skill_name }}</h3>
-              <p>{{ selectedSkill.explanation }}</p>
-              <button (click)="selectedSkill = null">Close</button>
-            </div>
-          </div>
+      <div *ngIf="selectedSkill" class="skill-explanation-modal" (click)="selectedSkill = null">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <span class="mono label">Skill</span>
+          <h3>{{ selectedSkill.skill_name }}</h3>
+          <p>{{ selectedSkill.explanation }}</p>
+          <button (click)="selectedSkill = null">Close</button>
         </div>
       </div>
     </div>
   `,
   styles: [`
     @import '../../../theme.scss';
-    .detail-page { min-height: 100vh; padding: $spacing-xxl 0; }
-    .container { @include section-container; }
-    .back-link { display: inline-block; margin-bottom: $spacing-lg; }
-    .experience-detail { max-width: 800px; margin: 0 auto; }
-    .experience-detail h1 { margin-bottom: $spacing-xs; }
-    .experience-detail h2 { color: $text-secondary; margin-bottom: $spacing-sm; }
-    .period { font-size: 14px; color: $text-secondary; margin-bottom: $spacing-lg; }
-    .summary { line-height: 1.8; margin-bottom: $spacing-xl; }
-    .skills-section h3 { margin-bottom: $spacing-md; }
-    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: $spacing-md; margin-bottom: $spacing-lg; }
-    .skill-chip { @include card-base; cursor: pointer; padding: $spacing-md; text-align: center; font-weight: $font-weight-bold; position: relative; }
-    .skill-chip:hover { background: $button-bg; color: $button-text; }
-    .delete-skill { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.1); border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; }
-    .add-skill-chip { background: transparent; border: 2px dashed $border-color; }
-    .add-skill-chip:hover { border-color: $accent-color; background: transparent; }
-    .add-skill-form { display: flex; flex-direction: column; gap: $spacing-sm; max-width: 500px; }
-    .add-skill-form input, .add-skill-form textarea { padding: $spacing-md; border: $border-width solid $border-color; border-radius: $border-radius; font-family: $font-family; }
-    .skill-explanation-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); @include flex-center; z-index: $z-modal; }
-    .modal-content { @include card-base; max-width: 600px; margin: $spacing-lg; }
-    .modal-content h3 { margin-bottom: $spacing-md; }
-    .modal-content p { line-height: 1.8; margin-bottom: $spacing-lg; }
+    .detail-page { min-height: 100vh; }
+    .hero-band .container { padding-top: $spacing-xl; padding-bottom: clamp(3rem, 7vw, 5rem); }
+    .back-link { display: inline-block; margin-bottom: clamp(3rem, 8vw, 6rem); }
+    .back-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .period { color: var(--muted); margin-bottom: $spacing-md; }
+    h1 {
+      font-size: clamp(3rem, 9vw, 7.5rem);
+      line-height: 0.9;
+      text-transform: uppercase;
+      letter-spacing: -0.04em;
+      margin-bottom: $spacing-md;
+    }
+    .company { font-size: clamp(1.5rem, 3vw, 2.5rem); color: var(--muted); }
+    .body { padding-top: clamp(3rem, 7vw, 5rem); }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      gap: $spacing-lg;
+      padding: $spacing-lg 0;
+      border-top: 1px solid var(--line);
+    }
+    .label { color: var(--muted); }
+    .summary { font-family: $font-display; font-size: clamp(1.25rem, 2.2vw, 1.85rem); font-weight: 600; line-height: 1.3; }
+    .hint { color: var(--muted); font-size: 10px; margin-bottom: $spacing-sm; }
+    .skills-grid { display: flex; flex-wrap: wrap; gap: $spacing-xs; }
+    .skill-chip { position: relative; }
+    .delete-skill { margin-left: 4px; font-size: 11px; opacity: 0.6; }
+    .delete-skill:hover { color: $danger; opacity: 1; }
+    .add-skill-chip { border-style: dashed; }
+    .empty { font-family: $font-serif; font-style: italic; font-size: 1.5rem; color: var(--muted); }
+    .skill-explanation-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(6px);
+      @include flex-center;
+      z-index: $z-modal;
+      padding: $spacing-lg;
+    }
+    .modal-content {
+      max-width: 560px;
+      width: 100%;
+      padding: $spacing-xl;
+      background: var(--bg);
+      border-radius: $border-radius;
+      animation: pop 0.4s $ease-out;
+    }
+    .modal-content h3 { font-size: 2.25rem; text-transform: uppercase; margin: $spacing-xs 0 $spacing-md; }
+    .modal-content p { line-height: 1.75; color: var(--muted); margin-bottom: $spacing-lg; }
+    @keyframes pop { from { opacity: 0; transform: translateY(20px) scale(0.97); } }
+    @media (max-width: $bp-mobile) { .summary-grid { grid-template-columns: 1fr; gap: $spacing-sm; } }
   `]
 })
 export class ExperienceDetailComponent implements OnInit {

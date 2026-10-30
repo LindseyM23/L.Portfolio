@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { PortfolioService } from './services/portfolio.service';
@@ -15,6 +15,15 @@ export class AppComponent implements OnInit {
   isAdminMode = false;
 
   constructor(private portfolioService: PortfolioService) {}
+
+  // Open the native calendar when a date field is clicked anywhere, not just on its icon
+  @HostListener('document:click', ['$event'])
+  openDatePicker(event: MouseEvent): void {
+    const target = event.target as HTMLInputElement;
+    if (target?.tagName === 'INPUT' && target.type === 'date' && !target.disabled) {
+      try { target.showPicker?.(); } catch { /* not supported or not user-activated */ }
+    }
+  }
 
   ngOnInit(): void {
     this.portfolioService.adminMode$.subscribe(mode => {

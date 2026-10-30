@@ -13,11 +13,13 @@ import { PortfolioService } from '../../services/portfolio.service';
 export class HeaderComponent implements OnInit {
   isAdmin = false;
   isScrolled = false;
+  menuOpen = false;
+  scrollProgress = 0;
 
   navLinks = [
     { label: 'About Me', target: 'about' },
     { label: 'Services', target: 'services' },
-    { label: 'Certs & Badges', target: 'certifications' },
+    { label: 'Certs', target: 'certifications' },
     { label: 'Experience', target: 'experience' },
     { label: 'Portfolio', target: 'portfolio' },
     { label: 'KPIs', target: 'kpis' },
@@ -38,12 +40,15 @@ export class HeaderComponent implements OnInit {
   @HostListener('window:scroll', [])
   onWindowScroll(): void {
     this.isScrolled = window.scrollY > 50;
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    this.scrollProgress = scrollable > 0 ? window.scrollY / scrollable : 0;
   }
 
   scrollTo(target: string): void {
+    this.menuOpen = false;
     const element = document.getElementById(target);
     if (element) {
-      const headerOffset = 70;
+      const headerOffset = 64;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - headerOffset;
 

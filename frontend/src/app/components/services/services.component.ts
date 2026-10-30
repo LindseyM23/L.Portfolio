@@ -3,49 +3,56 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
 import { Service } from '../../models/portfolio.models';
+import { RevealDirective } from '../../shared/reveal.directive';
 
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RevealDirective],
   template: `
-    <section class="services-section">
+    <section class="services-section dark">
       <div class="container">
-        <h2 class="section-title">What I Do</h2>
-        
-        <div class="services-grid">
-          <div *ngFor="let service of services" class="service-card">
-            <div *ngIf="!isEditing(service.id)" class="service-content">
-              <h3>{{ service.title }}</h3>
-              <p>{{ service.description }}</p>
-              <div *ngIf="isAdmin" class="card-actions">
-                <button (click)="startEdit(service)">
-                  <img src="/assets/icons/edit.svg" alt="Edit" style="width: 16px; height: 16px; filter: brightness(0) invert(1);" />
+        <header class="section-head" appReveal>
+          <span class="section-index">(02)</span>
+          <h2 class="section-title">What I <em>do</em></h2>
+          <p class="section-kicker">From the first sketch to production in the cloud: the services I bring to teams and clients.</p>
+        </header>
+
+        <ol class="services-list">
+          <li *ngFor="let service of services; let i = index" class="service-row" appReveal [revealDelay]="i * 0.05">
+            <ng-container *ngIf="!isEditing(service.id)">
+              <span class="service-num mono">{{ (i + 1).toString().padStart(2, '0') }}</span>
+              <h3 class="service-title">{{ service.title }}</h3>
+              <p class="service-desc">{{ service.description }}</p>
+              <span class="service-arrow" aria-hidden="true">&#x2197;</span>
+              <div *ngIf="isAdmin" class="admin-actions">
+                <button (click)="startEdit(service)" aria-label="Edit">
+                  <img src="assets/icons/edit.svg" alt="" class="ico" />
                 </button>
-                <button (click)="deleteService(service.id!)">🗑️</button>
+                <button class="btn-ghost" (click)="deleteService(service.id!)">Delete</button>
               </div>
-            </div>
-            
+            </ng-container>
+
             <div *ngIf="isEditing(service.id)" class="edit-form">
               <input [(ngModel)]="editData.title" placeholder="Title" />
               <textarea [(ngModel)]="editData.description" rows="4"></textarea>
-              <button (click)="saveService()">Save</button>
-              <button (click)="cancelEdit()">Cancel</button>
+              <div class="btn-row">
+                <button (click)="saveService()">Save</button>
+                <button class="btn-ghost" (click)="cancelEdit()">Cancel</button>
+              </div>
             </div>
-          </div>
+          </li>
+        </ol>
 
-          <div *ngIf="isAdmin && !adding" class="add-card" (click)="adding = true">
-            <span class="add-icon">+</span>
-            <p>Add Service</p>
-          </div>
+        <div *ngIf="isAdmin && !adding" class="add-tile" (click)="adding = true">+ Add service</div>
 
-          <div *ngIf="adding" class="service-card">
-            <div class="edit-form">
-              <input [(ngModel)]="newService.title" placeholder="Service Title" />
-              <textarea [(ngModel)]="newService.description" placeholder="Description" rows="4"></textarea>
-              <button (click)="addService()">Add</button>
-              <button (click)="cancelAdd()">Cancel</button>
-            </div>
+        <div *ngIf="adding" class="admin-form">
+          <h4>Add service</h4>
+          <input [(ngModel)]="newService.title" placeholder="Service Title" />
+          <textarea [(ngModel)]="newService.description" placeholder="Description" rows="4"></textarea>
+          <div class="btn-row">
+            <button (click)="addService()">Add</button>
+            <button class="btn-ghost" (click)="cancelAdd()">Cancel</button>
           </div>
         </div>
       </div>
@@ -53,19 +60,53 @@ import { Service } from '../../models/portfolio.models';
   `,
   styles: [`
     @import '../../../theme.scss';
-    .services-section { @include section-container; padding: $spacing-xxl 0; }
-    .section-title { text-align: center; margin-bottom: $spacing-xxl; }
-    .services-grid { @include responsive-grid(3); }
-    .service-card { @include card-base; position: relative; }
-    .service-content h3 { margin-bottom: $spacing-md; }
-    .service-content p { color: $text-secondary; line-height: 1.6; }
-    .card-actions { margin-top: $spacing-md; display: flex; gap: $spacing-sm; }
-    .card-actions button { padding: $spacing-xs $spacing-sm; font-size: 14px; }
-    .add-card { @include card-base; @include flex-center; flex-direction: column; cursor: pointer; min-height: 200px; border: 2px dashed $border-color; }
-    .add-card:hover { border-color: $accent-color; }
-    .add-icon { font-size: 3rem; }
-    .edit-form { display: flex; flex-direction: column; gap: $spacing-sm; }
-    .edit-form input, .edit-form textarea { padding: $spacing-md; border: $border-width solid $border-color; border-radius: $border-radius; font-family: $font-family; }
+    :host { display: block; }
+    .services-list { list-style: none; border-top: 1px solid var(--fg); }
+    .service-row {
+      position: relative;
+      display: grid;
+      grid-template-columns: 80px 1.1fr 1fr 48px;
+      align-items: center;
+      gap: $spacing-lg;
+      padding: clamp(1.5rem, 3vw, 2.5rem) $spacing-sm;
+      border-bottom: 1px solid var(--line);
+      isolation: isolate;
+      transition: color $transition-normal;
+    }
+    .service-row::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: $white;
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform $transition-normal;
+    }
+    .service-row:hover { color: $black; --muted: rgba(10,10,10,0.6); --fg: #{$black}; --bg: #{$white}; --line: rgba(10,10,10,0.15); --icon-on-fg: invert(1); }
+    .service-row:hover::before { transform: scaleY(1); transform-origin: top; }
+    .service-num { color: var(--muted); }
+    .service-title {
+      font-size: clamp(1.6rem, 3.6vw, 3rem);
+      text-transform: uppercase;
+      transition: transform $transition-normal;
+    }
+    .service-row:hover .service-title { transform: translateX(12px); }
+    .service-desc { color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 46ch; white-space: pre-line; }
+    .service-arrow {
+      font-size: 1.75rem;
+      justify-self: end;
+      transition: transform $transition-normal;
+    }
+    .service-row:hover .service-arrow { transform: rotate(45deg); }
+    .admin-actions { grid-column: 2 / -1; margin-top: 0; }
+    .edit-form { grid-column: 1 / -1; display: flex; flex-direction: column; gap: $spacing-xs; }
+    .add-tile { margin-top: $spacing-lg; min-height: 100px; }
+    @media (max-width: $bp-mobile) {
+      .service-row { grid-template-columns: 40px 1fr; gap: $spacing-xs $spacing-sm; }
+      .service-desc { grid-column: 2; }
+      .service-arrow { display: none; }
+    }
   `]
 })
 export class ServicesComponent implements OnInit {

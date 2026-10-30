@@ -185,6 +185,10 @@ export class PortfolioService {
     return this.http.get<Models.Project[]>(`${this.apiUrl}/api/projects`);
   }
 
+  getProject(id: number): Observable<Models.Project> {
+    return this.http.get<Models.Project>(`${this.apiUrl}/api/projects/${id}`);
+  }
+
   createProject(project: Models.Project): Observable<any> {
     return this.http.post(`${this.apiUrl}/api/projects`, project, { headers: this.getHeaders() });
   }

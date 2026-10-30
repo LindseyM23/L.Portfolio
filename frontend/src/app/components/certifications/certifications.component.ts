@@ -3,126 +3,165 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
 import { Certification } from '../../models/portfolio.models';
+import { RevealDirective } from '../../shared/reveal.directive';
 
 @Component({
   selector: 'app-certifications',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RevealDirective],
   template: `
     <section class="certs-section">
       <div class="container">
-        <h2 class="section-title">Certifications & Badges</h2>
-        
-        <div class="carousel">
-          <div *ngFor="let cert of certifications" class="cert-item">
-            <div class="cert-card" *ngIf="editingCert !== cert.id">
-              <img *ngIf="cert.badge_image" [src]="cert.badge_image" [alt]="cert.name" class="badge" />
-              <div *ngIf="!cert.badge_image" class="badge-placeholder">🏆</div>
+        <header class="section-head" appReveal>
+          <span class="section-index">(03)</span>
+          <h2 class="section-title">Certs <em>&amp;</em> badges</h2>
+          <p class="section-kicker">Credentials earned along the way, verified and on the record.</p>
+        </header>
+
+        <div class="certs-grid">
+          <article *ngFor="let cert of certifications; let i = index" class="cert-item" appReveal [revealDelay]="i * 0.1">
+            <div class="cert-card" *ngIf="editingCert !== cert.id"
+                 [class.clickable]="cert.cert_image"
+                 (click)="cert.cert_image && (showCertImage = cert.id!)">
+              <span class="cert-num mono">No. {{ (i + 1).toString().padStart(2, '0') }}</span>
+              <div class="badge-wrap">
+                <img *ngIf="cert.badge_image" [src]="cert.badge_image" [alt]="cert.name" class="badge" />
+                <span *ngIf="!cert.badge_image" class="badge-placeholder">&#x2726;</span>
+              </div>
               <h4>{{ cert.name }}</h4>
-              <p *ngIf="cert.issuer">{{ cert.issuer }}</p>
-              
-              <div *ngIf="isAdmin" class="cert-actions">
+              <p class="mono cert-meta">
+                <span *ngIf="cert.issuer">{{ cert.issuer }}</span>
+                <span *ngIf="cert.issued_date">{{ cert.issued_date | date:'MMM yyyy' }}</span>
+              </p>
+
+              <div *ngIf="isAdmin" class="admin-actions" (click)="$event.stopPropagation()">
                 <button (click)="startEditCert(cert)">Edit</button>
-                <button (click)="deleteCert(cert.id!)">Delete</button>
+                <button class="btn-ghost" (click)="deleteCert(cert.id!)">Delete</button>
               </div>
             </div>
 
             <div class="cert-card edit-mode" *ngIf="editingCert === cert.id">
-              <h4>Edit Certification</h4>
+              <h4 class="mono">Edit certification</h4>
               <input [(ngModel)]="editCertData.name" placeholder="Certification Name" />
               <input [(ngModel)]="editCertData.issuer" placeholder="Issuer" />
               <input [(ngModel)]="editCertData.issued_date" type="date" />
-              <div class="cert-actions">
+              <div class="btn-row">
                 <button (click)="saveEditCert()">Save</button>
-                <button (click)="cancelEditCert()">Cancel</button>
+                <button class="btn-ghost" (click)="cancelEditCert()">Cancel</button>
               </div>
             </div>
 
             <div *ngIf="cert.cert_image && showCertImage === cert.id" class="cert-overlay" (click)="showCertImage = null">
               <img [src]="cert.cert_image" alt="Certificate" />
             </div>
-          </div>
+          </article>
 
-          <div *ngIf="isAdmin && !adding" class="add-cert" (click)="adding = true">
-            <span>+ Add Certification</span>
-          </div>
+          <div *ngIf="isAdmin && !adding" class="add-tile" (click)="adding = true">+ Add certification</div>
         </div>
 
-        <div *ngIf="adding" class="add-form card">
-          <h3>Add Certification</h3>
+        <div *ngIf="adding" class="admin-form">
+          <h3>Add certification</h3>
           <input [(ngModel)]="newCert.name" placeholder="Certification Name" />
           <input [(ngModel)]="newCert.issuer" placeholder="Issuer" />
-          
-          <div class="file-input-group">
-            <label>Badge Image:</label>
-            <input type="file" 
-                   #badgeInput 
-                   (change)="onBadgeUpload($event)" 
-                   accept="image/*" 
-                   style="display: none;" />
-            <button type="button" (click)="badgeInput.click()" class="upload-btn">
-              <img src="/assets/icons/camera.svg" alt="Upload" style="width: 16px; height: 16px; filter: brightness(0) invert(1);" />
-              Upload Badge
+
+          <label>Badge image</label>
+          <div class="file-row">
+            <input type="file" #badgeInput (change)="onBadgeUpload($event)" accept="image/*" hidden />
+            <button type="button" (click)="badgeInput.click()" class="btn-sm">
+              <img src="assets/icons/camera.svg" alt="" class="ico" />
+              Upload badge
             </button>
             <span *ngIf="badgePreview" class="preview">
-              <img [src]="badgePreview" alt="Preview" style="width: 60px; height: 60px; object-fit: contain;" />
-              <button type="button" (click)="clearBadge()" class="clear-btn">✕</button>
+              <img [src]="badgePreview" alt="Preview" />
+              <button type="button" (click)="clearBadge()" class="btn-sm btn-ghost">✕</button>
             </span>
           </div>
 
-          <div class="file-input-group">
-            <label>Certificate Image (optional):</label>
-            <input type="file" 
-                   #certInput 
-                   (change)="onCertUpload($event)" 
-                   accept="image/*" 
-                   style="display: none;" />
-            <button type="button" (click)="certInput.click()" class="upload-btn">
-              <img src="/assets/icons/camera.svg" alt="Upload" style="width: 16px; height: 16px; filter: brightness(0) invert(1);" />
-              Upload Certificate
+          <label>Certificate image (optional)</label>
+          <div class="file-row">
+            <input type="file" #certInput (change)="onCertUpload($event)" accept="image/*" hidden />
+            <button type="button" (click)="certInput.click()" class="btn-sm">
+              <img src="assets/icons/camera.svg" alt="" class="ico" />
+              Upload certificate
             </button>
             <span *ngIf="certPreview" class="preview">
-              <img [src]="certPreview" alt="Preview" style="width: 60px; height: 60px; object-fit: contain;" />
-              <button type="button" (click)="clearCert()" class="clear-btn">✕</button>
+              <img [src]="certPreview" alt="Preview" />
+              <button type="button" (click)="clearCert()" class="btn-sm btn-ghost">✕</button>
             </span>
           </div>
 
           <input [(ngModel)]="newCert.issued_date" type="date" />
-          <button (click)="addCert()">Add</button>
-          <button (click)="cancelAdd()">Cancel</button>
+          <div class="btn-row">
+            <button (click)="addCert()">Add</button>
+            <button class="btn-ghost" (click)="cancelAdd()">Cancel</button>
+          </div>
         </div>
       </div>
     </section>
   `,
   styles: [`
     @import '../../../theme.scss';
-    .certs-section { @include section-container; padding: $spacing-xxl 0; background: #fafafa; }
-    .section-title { text-align: center; margin-bottom: $spacing-xxl; }
-    .carousel { display: flex; gap: $spacing-lg; overflow-x: auto; padding: $spacing-lg 0; }
-    .cert-item { min-width: 250px; }
-    .cert-card { @include card-base; text-align: center; cursor: pointer; }
-    .cert-card:hover { transform: translateY(-8px); }
-    .cert-card.edit-mode { cursor: default; }
-    .cert-card.edit-mode:hover { transform: none; }
-    .cert-card.edit-mode input { width: 100%; padding: $spacing-sm; margin: $spacing-xs 0; border: $border-width solid $border-color; border-radius: $border-radius; }
-    .badge { width: 100%; height: 200px; object-fit: contain; margin-bottom: $spacing-md; }
-    .badge-placeholder { width: 100%; height: 200px; @include flex-center; font-size: 4rem; background: #f0f0f0; border-radius: $border-radius; margin-bottom: $spacing-md; }
-    .cert-card h4 { margin-bottom: $spacing-sm; }
-    .cert-card p { color: $text-secondary; font-size: 14px; }
-    .cert-actions { margin-top: $spacing-md; }
-    .cert-actions button { font-size: 12px; padding: $spacing-xs $spacing-sm; }
-    .add-cert { @include card-base; min-width: 250px; @include flex-center; cursor: pointer; border: 2px dashed $border-color; }
-    .add-cert:hover { border-color: $accent-color; }
-    .add-form { margin-top: $spacing-lg; display: flex; flex-direction: column; gap: $spacing-sm; max-width: 500px; }
-    .add-form input { padding: $spacing-md; border: $border-width solid $border-color; border-radius: $border-radius; }
-    .file-input-group { display: flex; flex-direction: column; gap: $spacing-xs; }
-    .file-input-group label { font-size: 14px; font-weight: $font-weight-bold; }
-    .upload-btn { background: $button-bg; color: $button-text; border: none; padding: $spacing-md; border-radius: $border-radius; cursor: pointer; display: flex; align-items: center; gap: $spacing-xs; justify-content: center; }
-    .upload-btn:hover { opacity: 0.9; }
-    .preview { display: flex; align-items: center; gap: $spacing-sm; padding: $spacing-sm; background: #f0f0f0; border-radius: $border-radius; }
-    .clear-btn { background: black; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1; }
-    .clear-btn:hover { background: #ff4444; }
-    .cert-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); @include flex-center; z-index: $z-modal; cursor: pointer; }
+    :host { display: block; }
+    .certs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: $spacing-lg;
+    }
+    .cert-item { perspective: 1000px; }
+    .cert-card {
+      position: relative;
+      height: 100%;
+      padding: $spacing-lg;
+      border: 1px solid var(--fg);
+      border-radius: $border-radius;
+      background: var(--bg);
+      text-align: center;
+      transition: transform $transition-normal, box-shadow $transition-normal;
+      transform-style: preserve-3d;
+    }
+    .cert-card:not(.edit-mode):hover {
+      transform: rotateX(6deg) rotateY(-8deg) translateY(-6px);
+      box-shadow: 10px 14px 0 var(--fg);
+    }
+    .cert-card.clickable { cursor: zoom-in; }
+    .cert-num { position: absolute; top: 16px; left: 18px; font-size: 10px; color: var(--muted); }
+    .badge-wrap {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: $spacing-md auto $spacing-lg;
+      @include flex-center;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      outline: 1px dashed var(--line);
+      outline-offset: 10px;
+      transform: translateZ(40px);
+    }
+    .badge {
+      width: 82%;
+      height: 82%;
+      object-fit: contain;
+      filter: grayscale(1) contrast(1.15);
+      transition: filter $transition-slow, transform $transition-slow;
+    }
+    .cert-card:hover .badge { filter: none; transform: scale(1.06); }
+    .badge-placeholder { font-size: 4rem; }
+    .cert-card h4 { font-size: 1.15rem; line-height: 1.25; margin-bottom: $spacing-xs; transform: translateZ(20px); }
+    .cert-meta { display: flex; justify-content: center; gap: $spacing-sm; color: var(--muted); font-size: 11px; }
+    .cert-meta span + span::before { content: '/'; margin-right: $spacing-sm; }
+    .admin-actions { justify-content: center; }
+    .cert-card.edit-mode { display: flex; flex-direction: column; gap: $spacing-xs; text-align: left; }
+    .file-row { display: flex; align-items: center; gap: $spacing-sm; flex-wrap: wrap; }
+    .preview { display: inline-flex; align-items: center; gap: $spacing-xs; }
+    .preview img { width: 56px; height: 56px; object-fit: contain; }
+    .cert-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.92);
+      @include flex-center;
+      z-index: $z-modal;
+      cursor: zoom-out;
+    }
     .cert-overlay img { max-width: 90%; max-height: 90%; }
   `]
 })

@@ -1,254 +1,277 @@
 @import '../../../theme.scss';
 
-.about-section {
-  @include section-container;
-  padding: $spacing-xxl 0;
-}
-
-.section-title {
-  text-align: center;
-  margin-bottom: $spacing-xxl;
-}
+:host { display: block; }
 
 .about-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $spacing-xxl;
+  grid-template-columns: 1fr 3fr;
+  gap: $spacing-xl;
 
-  @media (max-width: 768px) {
+  @media (max-width: $bp-mobile) {
     grid-template-columns: 1fr;
+    gap: $spacing-md;
   }
 }
 
-.overview {
-  position: relative;
-  line-height: 1.8;
-  font-size: 1.1rem;
+.about-aside {
+  color: var(--muted);
 
-  .edit-btn {
+  .asterisk {
+    display: block;
     margin-top: $spacing-md;
-    font-size: 14px;
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--fg);
+    animation: spin 14s linear infinite;
+    width: fit-content;
+
+    @media (max-width: $bp-mobile) { display: none; }
+  }
+}
+
+// Long overviews scroll inside a fixed-height box, with fades
+// hinting at the hidden text above/below.
+.statement-wrap {
+  position: relative;
+  margin-bottom: $spacing-md;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 12px;
+    height: 3.5rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity $transition-fast;
+    z-index: 1;
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(var(--bg), transparent);
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(transparent, var(--bg));
+  }
+
+  &.fade-top::before,
+  &.fade-bottom::after {
+    opacity: 1;
+  }
+}
+
+.statement {
+  font-family: $font-display;
+  font-size: clamp(1.4rem, 2.6vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  text-indent: 3em;
+  white-space: pre-line;
+  max-height: min(60vh, 32rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: $spacing-sm;
+  scrollbar-width: thin;
+  scrollbar-color: var(--fg) var(--line);
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-track { background: var(--line); }
+  &::-webkit-scrollbar-thumb { background: var(--fg); }
+}
+
+.scroll-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -0.5rem 0 $spacing-md;
+  font-size: 10px;
+  color: var(--muted);
+
+  .hint-line {
+    width: 32px;
+    height: 1px;
+    background: currentColor;
   }
 }
 
 .edit-form {
-  textarea {
-    width: 100%;
-    padding: $spacing-md;
-    border: $border-width solid $border-color;
-    border-radius: $border-radius;
-    font-family: $font-family;
-    font-size: 1rem;
-    resize: vertical;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  .char-counter {
+    color: var(--muted);
+    text-align: right;
+    font-size: 11px;
+  }
+}
+
+// ---------- Stats ----------
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: $spacing-xl;
+  border-top: $border-width solid var(--fg);
+
+  @media (max-width: $bp-mobile) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat {
+  padding: $spacing-md $spacing-sm $spacing-md 0;
+  border-bottom: $border-width solid var(--line);
+
+  dt {
+    color: var(--muted);
+    font-size: 11px;
+    margin-bottom: $spacing-xs;
   }
 
-  .btn-group {
-    display: flex;
-    gap: $spacing-sm;
-    margin-top: $spacing-md;
+  dd {
+    font-family: $font-display;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+
+    span {
+      font-family: $font-serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 0.55em;
+      margin-left: 2px;
+    }
   }
+}
+
+// ---------- Toolkit ----------
+.toolkit {
+  margin-top: clamp(4rem, 9vw, 7rem);
+}
+
+.toolkit-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: $spacing-md;
+
+  h3 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    text-transform: uppercase;
+  }
+
+  .mono { color: var(--muted); }
 }
 
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: $spacing-md;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  border-top: $border-width solid var(--line);
+  border-left: $border-width solid var(--line);
+
+  .add-tile {
+    border-radius: 0;
+    min-height: 100%;
+  }
 }
 
-.skill-badge {
+.skill-tile {
   position: relative;
-  background: rgb(0, 0, 0);
-  color: rgb(255, 255, 255);
-  border-radius: $border-radius;
-  text-align: center;
-  font-weight: $font-weight-bold;
-  transition: all $transition-fast;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: $spacing-sm;
+  aspect-ratio: 1;
+  padding: $spacing-md;
+  border-right: $border-width solid var(--line);
+  border-bottom: $border-width solid var(--line);
+  background: var(--bg);
+  transition: background $transition-normal, color $transition-normal;
 
-  .skill-display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+  .skill-num {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    font-size: 10px;
+    color: var(--muted);
   }
 
   .skill-icon {
-    width: 80px;
-    height: 80px;
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    filter: grayscale(1);
+    transition: filter $transition-normal, transform $transition-normal;
   }
 
-  .skill-actions {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    display: flex;
-    gap: 4px;
-  }
-
-  .edit-skill-btn,
-  .delete-badge {
-    background: rgb(255, 255, 255);
-    color: rgb(0, 0, 0);
-    border: none;
-    padding: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-
-    &:hover {
-      background: #ff4444;
-      color: white;
-    }
-  }
-
-  .edit-skill-inline {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-sm;
-
-    input {
-      padding: $spacing-sm;
-      border: $border-width solid $border-color;
-      border-radius: $border-radius;
-    }
-
-    .skill-edit-actions {
-      display: flex;
-      gap: $spacing-xs;
-      justify-content: center;
-
-      button {
-        padding: $spacing-xs $spacing-sm;
-        font-size: 12px;
-      }
-    }
+  .skill-name {
+    @include mono-label;
+    font-size: 11px;
   }
 
   &:hover {
-    transform: translateY(-4px);
+    @include invert;
+
+    .skill-icon {
+      filter: grayscale(0);
+      transform: scale(1.12) rotate(-6deg);
+    }
   }
 }
 
-.add-skill-btn {
-  border: 2px dashed $border-color;
-  font-size: 14px;
-  cursor: pointer;
-  color: white;
-}
-
-.add-form {
+.skill-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
   display: flex;
-  gap: $spacing-sm;
-  margin-top: $spacing-md;
+  gap: 4px;
+}
 
-  input {
-    flex: 1;
-    padding: $spacing-sm;
-    border: $border-width solid $border-color;
-    border-radius: $border-radius;
+.icon-btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  font-size: 11px;
+
+  .ico { width: 12px; height: 12px; }
+
+  &.danger:hover {
+    background: $danger;
+    border-color: $danger;
+    color: $white;
   }
 }
 
-.char-counter {
-  font-size: 12px;
-  color: $text-secondary;
-  text-align: right;
-  margin-top: 4px;
-}
-
-.add-skill-form {
+.edit-skill-inline {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
-  margin-top: $spacing-md;
-  padding: $spacing-md;
-  border: $border-width solid $border-color;
-  border-radius: $border-radius;
+  gap: $spacing-xs;
 
-  > input {
-    padding: $spacing-sm;
-    border: $border-width solid $border-color;
-    border-radius: $border-radius;
-    font-family: $font-family;
-    font-size: $font-size-base;
-  }
+  input { padding: 8px 10px; font-size: 13px; }
+}
 
-  .icon-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-sm;
+.icon-options {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
 
-    label {
-      font-size: 14px;
-      color: $text-secondary;
-    }
+.icon-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
 
-    .icon-options {
-      display: flex;
-      align-items: center;
-      gap: $spacing-sm;
-    }
+  img { width: 32px; height: 32px; }
+}
 
-    .upload-icon-btn {
-      padding: $spacing-sm $spacing-md;
-      background: $button-bg;
-      color: $button-text;
-      border: $border-width solid $border-color;
-      border-radius: $border-radius;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-
-      &:hover {
-        opacity: 0.8;
-      }
-    }
-
-    .icon-preview {
-      display: flex;
-      align-items: center;
-      gap: $spacing-sm;
-      padding: $spacing-sm;
-      border: $border-width solid $border-color;
-      border-radius: $border-radius;
-      background: #f5f5f5;
-
-      .clear-icon {
-        background: black;
-        color: white;
-        border: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        cursor: pointer;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-        line-height: 1;
-
-        &:hover {
-          background: #ff4444;
-        }
-      }
-    }
-  }
-
-  .btn-group {
-    display: flex;
-    gap: $spacing-sm;
-  }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

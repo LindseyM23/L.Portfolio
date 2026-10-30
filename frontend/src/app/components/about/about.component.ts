@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
+import { RevealDirective } from '../../shared/reveal.directive';
 import { About, Skill } from '../../models/portfolio.models';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RevealDirective],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss'
 })
@@ -22,6 +23,17 @@ export class AboutComponent implements OnInit {
   editSkillData: Skill = { name: '', order: 0 };
   skillIconPreview: string | null = null;
   skillIconFile: File | null = null;
+  @ViewChild('statement') statement?: ElementRef<HTMLElement>;
+  scrollable = false;
+  atTop = true;
+  atBottom = true;
+
+  stats = [
+    { label: 'Years building', value: 0, suffix: '+' },
+    { label: 'Roles held', value: 0, suffix: '' },
+    { label: 'Certifications', value: 0, suffix: '×' },
+    { label: 'Core skills', value: 0, suffix: '' }
+  ];
 
   constructor(private portfolioService: PortfolioService) {}
 
@@ -31,8 +43,29 @@ export class AboutComponent implements OnInit {
   }
 
   loadData(): void {
-    this.portfolioService.getAbout().subscribe(about => this.about = about);
-    this.portfolioService.getSkills().subscribe(skills => this.skills = skills);
+    this.portfolioService.getAbout().subscribe(about => {
+      this.about = about;
+      setTimeout(() => this.updateScrollState());
+    });
+    this.portfolioService.getSkills().subscribe(skills => {
+      this.skills = skills;
+      this.stats[3].value = skills.length;
+    });
+    this.portfolioService.getExperience().subscribe(exps => {
+      const earliest = Math.min(...exps.map(e => new Date(e.start_date).getTime()));
+      this.stats[0].value = exps.length ? new Date().getFullYear() - new Date(earliest).getFullYear() : 0;
+      this.stats[1].value = exps.length;
+    });
+    this.portfolioService.getCertifications().subscribe(certs => this.stats[2].value = certs.length);
+  }
+
+  @HostListener('window:resize')
+  updateScrollState(): void {
+    const el = this.statement?.nativeElement;
+    if (!el) return;
+    this.scrollable = el.scrollHeight > el.clientHeight + 1;
+    this.atTop = el.scrollTop <= 1;
+    this.atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
   }
 
   saveAbout(): void {
