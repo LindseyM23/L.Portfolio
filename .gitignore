@@ -55,3 +55,7 @@ Thumbs.db
 
 # Uploaded images now live in the database (media table)
 /backend/uploads
+
+# Local database (content + images); kept out of git
+/backend/instance/
+*.db
