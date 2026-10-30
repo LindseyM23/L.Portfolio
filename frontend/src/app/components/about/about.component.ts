@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
 import { RevealDirective } from '../../shared/reveal.directive';
 import { ModalComponent } from '../../shared/modal.component';
+import { MediaUrlPipe } from '../../shared/media-url.pipe';
 import { About, Skill } from '../../models/portfolio.models';
 import { ToastService } from '../../services/toast.service';
 import { ConfirmService } from '../../services/confirm.service';
@@ -11,7 +12,7 @@ import { ConfirmService } from '../../services/confirm.service';
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, FormsModule, RevealDirective, ModalComponent],
+  imports: [CommonModule, FormsModule, RevealDirective, ModalComponent, MediaUrlPipe],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss'
 })
@@ -101,7 +102,7 @@ export class AboutComponent implements OnInit {
     if (this.skillIconFile) {
       this.portfolioService.uploadFile(this.skillIconFile).subscribe({
         next: (response) => {
-          this.newSkill.icon = `http://localhost:5001${response.url}`;
+          this.newSkill.icon = response.url;
           this.createSkill();
         },
         error: err => this.toast.apiError(err, 'Could not upload icon')

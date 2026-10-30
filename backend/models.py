@@ -75,6 +75,16 @@ class ExperienceSkill(db.Model):
     order = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+class Media(db.Model):
+    """Uploaded images, stored in the database rather than on disk."""
+    __tablename__ = 'media'
+    id = db.Column(db.String(32), primary_key=True)  # random hex id, used in the URL
+    filename = db.Column(db.String(255), nullable=False)
+    content_type = db.Column(db.String(100), nullable=False)
+    size = db.Column(db.Integer, nullable=False)
+    data = db.Column(db.LargeBinary, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 class Project(db.Model):
     __tablename__ = 'projects'
     id = db.Column(db.Integer, primary_key=True)

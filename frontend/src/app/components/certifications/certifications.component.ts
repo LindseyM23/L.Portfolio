@@ -7,11 +7,12 @@ import { ToastService } from '../../services/toast.service';
 import { ConfirmService } from '../../services/confirm.service';
 import { RevealDirective } from '../../shared/reveal.directive';
 import { ModalComponent } from '../../shared/modal.component';
+import { MediaUrlPipe } from '../../shared/media-url.pipe';
 
 @Component({
   selector: 'app-certifications',
   standalone: true,
-  imports: [CommonModule, FormsModule, RevealDirective, ModalComponent],
+  imports: [CommonModule, FormsModule, RevealDirective, ModalComponent, MediaUrlPipe],
   template: `
     <section class="certs-section">
       <div class="container">
@@ -28,7 +29,7 @@ import { ModalComponent } from '../../shared/modal.component';
                  (click)="cert.cert_image && (showCertImage = cert.id!)">
               <span class="cert-num mono">No. {{ (i + 1).toString().padStart(2, '0') }}</span>
               <div class="badge-wrap">
-                <img *ngIf="cert.badge_image" [src]="cert.badge_image" [alt]="cert.name" class="badge" />
+                <img *ngIf="cert.badge_image" [src]="cert.badge_image | mediaUrl" [alt]="cert.name" class="badge" />
                 <span *ngIf="!cert.badge_image" class="badge-placeholder">&#x2726;</span>
               </div>
               <h4>{{ cert.name }}</h4>
@@ -50,7 +51,7 @@ import { ModalComponent } from '../../shared/modal.component';
     </section>
 
     <div *ngIf="certImage" class="cert-overlay" (click)="showCertImage = null">
-      <img [src]="certImage" alt="Certificate" />
+      <img [src]="certImage | mediaUrl" alt="Certificate" />
     </div>
 
     <app-modal [open]="editingCert !== null" title="Edit certification" kicker="Certs & badges" (closed)="cancelEditCert()">
@@ -221,7 +222,7 @@ export class CertificationsComponent implements OnInit {
     if (this.badgeFile) {
       this.portfolioService.uploadFile(this.badgeFile).subscribe({
         next: (response) => {
-          this.newCert.badge_image = `http://localhost:5001${response.url}`;
+          this.newCert.badge_image = response.url;
           this.uploadCertOrCreate();
         },
         error: err => this.toast.apiError(err, 'Could not upload badge image')
@@ -236,7 +237,7 @@ export class CertificationsComponent implements OnInit {
     if (this.certFile) {
       this.portfolioService.uploadFile(this.certFile).subscribe({
         next: (response) => {
-          this.newCert.cert_image = `http://localhost:5001${response.url}`;
+          this.newCert.cert_image = response.url;
           this.createCertification();
         },
         error: err => this.toast.apiError(err, 'Could not upload certificate image')

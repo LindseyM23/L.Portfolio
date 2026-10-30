@@ -48,7 +48,7 @@
       <div class="hero-right">
         <div class="profile-frame">
           <img *ngIf="about.profile_image"
-               [src]="about.profile_image"
+               [src]="about.profile_image | mediaUrl"
                alt="Lindsey Monyepao"
                class="profile-image" />
           <div *ngIf="!about.profile_image" class="profile-placeholder">

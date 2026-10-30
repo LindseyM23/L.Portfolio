@@ -52,3 +52,10 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# Uploaded images now live in the database (media table)
+/backend/uploads
+
+# Local database (content + images); kept out of git
+/backend/instance/
+*.db

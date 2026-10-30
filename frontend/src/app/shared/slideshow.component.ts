@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MediaUrlPipe } from './media-url.pipe';
 
 /**
  * Cross-fading image slideshow. Auto-advances, pauses on hover.
@@ -8,11 +9,11 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-slideshow',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MediaUrlPipe],
   template: `
     <div class="slides" (mouseenter)="pause()" (mouseleave)="play()">
       <img *ngFor="let src of images; let i = index"
-           [src]="src"
+           [src]="src | mediaUrl"
            [alt]="alt + ' — image ' + (i + 1)"
            [class.active]="i === index"
            draggable="false" />

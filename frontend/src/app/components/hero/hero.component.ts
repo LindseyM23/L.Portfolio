@@ -6,11 +6,12 @@ import { SocialLink, About } from '../../models/portfolio.models';
 import { ToastService } from '../../services/toast.service';
 import { ConfirmService } from '../../services/confirm.service';
 import { ModalComponent } from '../../shared/modal.component';
+import { MediaUrlPipe } from '../../shared/media-url.pipe';
 
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalComponent],
+  imports: [CommonModule, FormsModule, ModalComponent, MediaUrlPipe],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'
 })
@@ -121,7 +122,7 @@ export class HeroComponent implements OnInit {
     this.uploadingImage = true;
     this.portfolioService.uploadFile(file).subscribe({
       next: (response) => {
-        this.about.profile_image = `http://localhost:5001${response.url}`;
+        this.about.profile_image = response.url;
         this.saveAbout();
         this.uploadingImage = false;
       },
@@ -144,7 +145,7 @@ export class HeroComponent implements OnInit {
 
   addLink(): void {
     if (!this.toast.require({ Platform: this.newLink.platform, URL: this.newLink.url })) return;
-    if (!/^(https?:\/\/|mailto:)/i.test(this.newLink.url.trim())) {
+    if (!/^(https:\/\/|mailto:)/i.test(this.newLink.url.trim())) {
       this.toast.error('Check the URL', 'Links should start with https:// (or mailto: for email).');
       return;
     }

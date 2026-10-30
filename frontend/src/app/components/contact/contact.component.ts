@@ -214,6 +214,13 @@ export class ContactComponent implements OnInit, OnDestroy {
       this.toast.error('Check the email address', `"${email}" doesn't look like a valid email.`);
       return;
     }
+    const insecure = Object.entries({ LinkedIn: this.draft.linkedin, GitHub: this.draft.github, CV: this.draft.cv_url })
+      .filter(([, url]) => url?.trim() && !/^https:\/\//i.test(url.trim()))
+      .map(([label]) => label);
+    if (insecure.length) {
+      this.toast.error('Use secure links', `${insecure.join(', ')} must start with https://`);
+      return;
+    }
     this.portfolioService.updateContact(this.draft).subscribe({
       next: () => {
         this.editing = false;
