@@ -31,7 +31,8 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Admin
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
+    # Strip stray whitespace/newlines that dashboards' multi-line fields can add
+    ADMIN_PASSWORD = (os.environ.get('ADMIN_PASSWORD') or '').strip() or None
     TOKEN_LIFETIME_HOURS = int(os.environ.get('TOKEN_LIFETIME_HOURS', 12))
 
     # Uploads are stored in the database (see Media model)
@@ -51,7 +52,7 @@ class DevelopmentConfig(Config):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-only-secret-key'
     # Any local port (ng serve, previews); a regex is accepted by Flask-CORS
     CORS_ORIGINS = _origins(r'http://(localhost|127\.0\.0\.1)(:\d+)?')
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD') or 'admin123'
+    ADMIN_PASSWORD = Config.ADMIN_PASSWORD or 'admin123'
 
 
 class ProductionConfig(Config):
