@@ -65,6 +65,7 @@ export interface Project {
   name: string;
   description: string;
   image?: string;
+  images?: string[];
   live_url?: string;
   github_url?: string;
   technologies?: string;

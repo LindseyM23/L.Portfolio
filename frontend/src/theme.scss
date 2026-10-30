@@ -1,25 +1,33 @@
 // ========================================
 // CENTRALIZED DESIGN SYSTEM
-// All styling must use these variables
+// Monochrome editorial — black, white and the greys in between.
+// Colours are exposed as CSS custom properties so any section can
+// flip to the inverted (dark) palette with the `invert` mixin.
 // ========================================
 
 // ========== COLORS ==========
-$bg-primary: #FFFFFF;
-$text-primary: #000000;
-$text-secondary: #666666;
-$button-bg: #000000;
-$button-text: #FFFFFF;
-$border-color: #E0E0E0;
-$accent-color: #000000;
+$black: #0a0a0a;
+$white: #fafaf7;
+$bg-primary: var(--bg);
+$text-primary: var(--fg);
+$text-secondary: var(--muted);
+$button-bg: var(--fg);
+$button-text: var(--bg);
+$border-color: var(--line);
+$accent-color: var(--fg);
+$danger: #e5484d;
 
 // ========== TYPOGRAPHY ==========
-$font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+$font-display: 'Syne', 'Helvetica Neue', Arial, sans-serif;
+$font-serif: 'Instrument Serif', Georgia, serif;
+$font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
 $font-size-base: 16px;
-$font-size-h1: 3rem;
-$font-size-h2: 2rem;
+$font-size-h1: clamp(3.5rem, 11vw, 10rem);
+$font-size-h2: clamp(2.5rem, 7vw, 6rem);
 $font-size-h3: 1.5rem;
 $font-weight-normal: 400;
-$font-weight-bold: 600;
+$font-weight-bold: 700;
 
 // ========== SPACING ==========
 $spacing-xs: 0.5rem;
@@ -27,66 +35,104 @@ $spacing-sm: 1rem;
 $spacing-md: 1.5rem;
 $spacing-lg: 2rem;
 $spacing-xl: 3rem;
-$spacing-xxl: 4rem;
+$spacing-xxl: 6rem;
 
 // ========== BORDERS & RADIUS ==========
-$border-radius: 28px;
+$border-radius: 18px;
+$pill: 999px;
 $border-width: 1px;
 
 // ========== BUTTONS ==========
-$button-padding: 10px 32px;
-$button-border-radius: $border-radius;
-$button-font-weight: $font-weight-bold;
+$button-padding: 12px 28px;
+$button-border-radius: $pill;
+$button-font-weight: 600;
 
 // ========== CARDS ==========
-$card-bg: $bg-primary;
+$card-bg: var(--bg);
 $card-padding: $spacing-lg;
 $card-border-radius: $border-radius;
-$card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-$card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+$card-shadow: none;
+$card-shadow-hover: 8px 8px 0 var(--fg);
 
 // ========== LAYOUT ==========
-$header-height: 70px;
-$max-width-content: 1200px;
-$section-padding: $spacing-xxl 0;
+$header-height: 84px;
+$max-width-content: 1320px;
+$section-padding: clamp(5rem, 12vw, 9rem) 0;
 
 // ========== TRANSITIONS ==========
+$ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 $transition-fast: 0.2s ease;
-$transition-normal: 0.3s ease;
-$transition-slow: 0.5s ease;
+$transition-normal: 0.4s $ease-out;
+$transition-slow: 0.8s $ease-out;
 
 // ========== Z-INDEX ==========
 $z-header: 1000;
 $z-modal: 2000;
 $z-tooltip: 3000;
 
+// ========== BREAKPOINTS ==========
+$bp-tablet: 1024px;
+$bp-mobile: 768px;
+
 // ========================================
 // MIXINS
 // ========================================
 
+// Flip a block to the inverted palette.
+@mixin invert {
+  --bg: #{$black};
+  --fg: #{$white};
+  --muted: rgba(250, 250, 247, 0.6);
+  --line: rgba(250, 250, 247, 0.18);
+  --icon-on-fg: none;
+  --icon-on-bg: invert(1);
+  // Native controls (date pickers, selects, scrollbars) follow the dark palette
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--fg);
+}
+
 @mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: $button-padding;
   border-radius: $button-border-radius;
   font-weight: $button-font-weight;
+  font-size: 14px;
+  letter-spacing: 0.01em;
   background: $button-bg;
   color: $button-text;
-  border: none;
+  border: $border-width solid var(--fg);
   cursor: pointer;
-  transition: all $transition-fast;
+  transition: background $transition-fast, color $transition-fast, transform $transition-fast;
   font-family: $font-family;
-  
+
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: transparent;
+    color: var(--fg);
   }
-  
+
   &:active {
-    transform: translateY(0);
+    transform: scale(0.97);
   }
-  
+
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+  }
+}
+
+@mixin button-ghost {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--line);
+
+  &:hover {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
   }
 }
 
@@ -94,18 +140,20 @@ $z-tooltip: 3000;
   background: $card-bg;
   padding: $card-padding;
   border-radius: $card-border-radius;
-  box-shadow: $card-shadow;
-  transition: all $transition-normal;
-  
+  border: $border-width solid var(--line);
+  transition: transform $transition-normal, box-shadow $transition-normal, border-color $transition-normal;
+
   &:hover {
-    box-shadow: $card-shadow-hover;
+    border-color: var(--fg);
   }
 }
 
 @mixin section-container {
   max-width: $max-width-content;
   margin: 0 auto;
-  padding: $section-padding $spacing-lg;
+  padding: $section-padding;
+  padding-left: clamp(1rem, 4vw, 3rem);
+  padding-right: clamp(1rem, 4vw, 3rem);
 }
 
 @mixin flex-center {
@@ -114,16 +162,23 @@ $z-tooltip: 3000;
   justify-content: center;
 }
 
+@mixin mono-label {
+  font-family: $font-mono;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 @mixin responsive-grid($columns: 3, $gap: $spacing-lg) {
   display: grid;
   grid-template-columns: repeat($columns, 1fr);
   gap: $gap;
-  
-  @media (max-width: 1024px) {
+
+  @media (max-width: $bp-tablet) {
     grid-template-columns: repeat(2, 1fr);
   }
-  
-  @media (max-width: 768px) {
+
+  @media (max-width: $bp-mobile) {
     grid-template-columns: 1fr;
   }
 }

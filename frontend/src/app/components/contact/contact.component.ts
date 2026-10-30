@@ -1,91 +1,199 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../../services/portfolio.service';
 import { Contact } from '../../models/portfolio.models';
+import { RevealDirective } from '../../shared/reveal.directive';
 
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RevealDirective],
   template: `
     <section class="contact-section">
       <div class="container">
-        <h2 class="section-title">Get In Touch</h2>
-        
-        <div class="contact-grid">
-          <div class="contact-info card">
-            <div *ngIf="!editing" class="info-display">
-              <div class="contact-item" *ngIf="contact.email">
-                <span class="icon">📧</span>
-                <a [href]="'mailto:' + contact.email">{{ contact.email }}</a>
-              </div>
-              <div class="contact-item" *ngIf="contact.phone">
-                <span class="icon">📱</span>
-                <a [href]="'tel:' + contact.phone">{{ contact.phone }}</a>
-              </div>
-              <div class="contact-item" *ngIf="contact.linkedin">
-                <span class="icon">💼</span>
-                <a [href]="contact.linkedin" target="_blank">LinkedIn</a>
-              </div>
-              <div class="contact-item" *ngIf="contact.github">
-                <span class="icon">💻</span>
-                <a [href]="contact.github" target="_blank">GitHub</a>
-              </div>
-              <div class="contact-item" *ngIf="contact.location">
-                <span class="icon">📍</span>
-                <span>{{ contact.location }}</span>
-              </div>
-              <div class="contact-item" *ngIf="contact.cv_url">
-                <span class="icon">📄</span>
-                <a [href]="contact.cv_url" target="_blank">Download CV</a>
-              </div>
-              
-              <button *ngIf="isAdmin" (click)="editing = true" class="edit-contact-btn">
-                <img src="/assets/icons/edit.svg" alt="Edit" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px; filter: brightness(0) invert(1);" />
-                Edit Contact Info
-              </button>
-            </div>
+        <header class="section-head" appReveal>
+          <span class="section-index">(07)</span>
+          <h2 class="section-title">Get in <em>touch</em></h2>
+        </header>
 
-            <div *ngIf="editing" class="edit-form">
-              <input [(ngModel)]="contact.email" placeholder="Email" type="email" />
-              <input [(ngModel)]="contact.phone" placeholder="Phone" />
-              <input [(ngModel)]="contact.linkedin" placeholder="LinkedIn URL" />
-              <input [(ngModel)]="contact.github" placeholder="GitHub URL" />
-              <input [(ngModel)]="contact.location" placeholder="Location" />
-              <input [(ngModel)]="contact.cv_url" placeholder="CV URL" />
-              <button (click)="saveContact()">Save</button>
-              <button (click)="editing = false">Cancel</button>
-            </div>
+        <div *ngIf="!editing" class="contact-body">
+          <div class="cta" appReveal>
+            <p class="cta-line">Have a project in mind?</p>
+            <p class="cta-big">Let's <em>talk.</em></p>
+            <a *ngIf="contact.email" class="email" [href]="'mailto:' + contact.email">
+              <span>{{ contact.email }}</span>
+              <span class="arrow">&#x2197;</span>
+            </a>
+          </div>
+
+          <ul class="details">
+            <li *ngIf="contact.phone" appReveal>
+              <span class="mono">Phone</span>
+              <a [href]="'tel:' + contact.phone">{{ contact.phone }}</a>
+            </li>
+            <li *ngIf="contact.location" appReveal>
+              <span class="mono">Location</span>
+              <span>{{ contact.location }}</span>
+            </li>
+            <li *ngIf="contact.linkedin" appReveal>
+              <span class="mono">LinkedIn</span>
+              <a [href]="contact.linkedin" target="_blank" rel="noopener">Connect <span class="arrow">&#x2197;</span></a>
+            </li>
+            <li *ngIf="contact.github" appReveal>
+              <span class="mono">GitHub</span>
+              <a [href]="contact.github" target="_blank" rel="noopener">Browse code <span class="arrow">&#x2197;</span></a>
+            </li>
+            <li *ngIf="contact.cv_url" appReveal>
+              <span class="mono">Résumé</span>
+              <a [href]="contact.cv_url" target="_blank" rel="noopener">Download CV <span class="arrow">&#x2193;</span></a>
+            </li>
+          </ul>
+
+          <button *ngIf="isAdmin" (click)="editing = true" class="edit-contact-btn btn-sm">
+            <img src="assets/icons/edit.svg" alt="" class="ico" />
+            Edit contact info
+          </button>
+        </div>
+
+        <div *ngIf="editing" class="admin-form">
+          <h3>Edit contact info</h3>
+          <input [(ngModel)]="contact.email" placeholder="Email" type="email" />
+          <input [(ngModel)]="contact.phone" placeholder="Phone" />
+          <input [(ngModel)]="contact.linkedin" placeholder="LinkedIn URL" />
+          <input [(ngModel)]="contact.github" placeholder="GitHub URL" />
+          <input [(ngModel)]="contact.location" placeholder="Location" />
+          <input [(ngModel)]="contact.cv_url" placeholder="CV URL" />
+          <div class="btn-row">
+            <button (click)="saveContact()">Save</button>
+            <button class="btn-ghost" (click)="editing = false">Cancel</button>
           </div>
         </div>
       </div>
     </section>
+
+    <footer class="footer dark">
+      <div class="footer-inner">
+        <div class="footer-row mono">
+          <span>&copy; {{ year }} Lindsey Monyepao</span>
+          <span>Johannesburg &middot; {{ localTime }}</span>
+          <a href="#hero" class="top-link">Back to top &#x2191;</a>
+        </div>
+        <p class="wordmark" aria-hidden="true">Lindsey<em>.</em></p>
+      </div>
+    </footer>
   `,
   styles: [`
     @import '../../../theme.scss';
-    .contact-section { @include section-container; padding: $spacing-xxl 0; }
-    .section-title { text-align: center; margin-bottom: $spacing-xxl; }
-    .contact-grid { max-width: 600px; margin: 0 auto; }
-    .contact-info { padding: $spacing-xl; }
-    .contact-item { display: flex; align-items: center; gap: $spacing-md; margin-bottom: $spacing-lg; font-size: 1.1rem; }
-    .contact-item .icon { font-size: 1.5rem; }
-    .contact-item a { font-weight: $font-weight-bold; }
-    .edit-contact-btn { margin-top: $spacing-lg; }
-    .edit-form { display: flex; flex-direction: column; gap: $spacing-md; }
-    .edit-form input { padding: $spacing-md; border: $border-width solid $border-color; border-radius: $border-radius; font-family: $font-family; }
+    :host { display: block; }
+    .contact-body {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: $spacing-xl;
+      align-items: end;
+    }
+    .cta-line { font-family: $font-mono; font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+    .cta-big {
+      font-family: $font-display;
+      font-size: clamp(4rem, 12vw, 10rem);
+      font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -0.05em;
+      margin: $spacing-sm 0 $spacing-lg;
+    }
+    .email {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-sm;
+      position: relative;
+      font-size: clamp(1.1rem, 2.6vw, 2rem);
+      font-weight: 500;
+      padding-bottom: 6px;
+      word-break: break-all;
+    }
+    .email::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--fg);
+      transform-origin: right;
+      transition: transform $transition-normal;
+    }
+    .email:hover::after { transform: scaleX(0); }
+    .arrow { display: inline-block; transition: transform $transition-normal; }
+    .email:hover .arrow, .details a:hover .arrow { transform: rotate(45deg); }
+    .details { list-style: none; border-top: 1px solid var(--fg); }
+    .details li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: $spacing-sm;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+    }
+    .details .mono { color: var(--muted); }
+    .details a { font-weight: 500; }
+    .details a:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .edit-contact-btn { grid-column: 1 / -1; justify-self: start; }
+
+    .footer { overflow: hidden; }
+    .footer-inner { max-width: $max-width-content; margin: 0 auto; padding: $spacing-xl clamp(1rem, 4vw, 3rem) 0; }
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: $spacing-sm;
+      color: var(--muted);
+      padding-bottom: $spacing-lg;
+      border-bottom: 1px solid var(--line);
+    }
+    .top-link { color: var(--fg); }
+    .top-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .wordmark {
+      font-family: $font-display;
+      font-size: clamp(3rem, 11.2vw, 10rem);
+      font-weight: 800;
+      line-height: 0.8;
+      letter-spacing: -0.06em;
+      text-transform: uppercase;
+      text-align: center;
+      white-space: nowrap;
+      padding: $spacing-md 0 0.12em;
+    }
+    @media (max-width: $bp-mobile) {
+      .contact-body { grid-template-columns: 1fr; }
+    }
   `]
 })
-export class ContactComponent implements OnInit {
+export class ContactComponent implements OnInit, OnDestroy {
   isAdmin = false;
   contact: Contact = {};
   editing = false;
+  year = new Date().getFullYear();
+  localTime = '';
+  private clock?: ReturnType<typeof setInterval>;
 
   constructor(private portfolioService: PortfolioService) {}
 
   ngOnInit(): void {
     this.loadContact();
     this.portfolioService.adminMode$.subscribe(mode => this.isAdmin = mode);
+    this.tick();
+    this.clock = setInterval(() => this.tick(), 30000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.clock);
+  }
+
+  private tick(): void {
+    this.localTime = new Date().toLocaleTimeString('en-ZA', {
+      hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Johannesburg'
+    }) + ' SAST';
   }
 
   loadContact(): void {

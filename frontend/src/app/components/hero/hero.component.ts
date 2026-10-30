@@ -24,10 +24,12 @@ export class HeroComponent implements OnInit {
   // Form data
   newLink: SocialLink = { platform: '', url: '', order: 0 };
   uploadingImage = false;
+  year = new Date().getFullYear();
+  location = '';
   
   // Typewriter effect
   typedText = '';
-  private titles = [
+  titles = [
     'Full-Stack Developer',
     '3X AWS Certified Solutions Architect',
     'Cloud Developer',
@@ -96,6 +98,9 @@ export class HeroComponent implements OnInit {
     });
     this.portfolioService.getAbout().subscribe(about => {
       this.about = about;
+    });
+    this.portfolioService.getContact().subscribe(contact => {
+      this.location = contact.location ?? '';
     });
   }
 

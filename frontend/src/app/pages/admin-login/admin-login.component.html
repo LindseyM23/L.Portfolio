@@ -1,7 +1,14 @@
 <div class="admin-login-container">
+  <aside class="brand dark">
+    <a routerLink="/" class="mono back-link">&larr; Back to portfolio</a>
+    <p class="brand-mark">Studio<br><em>access.</em></p>
+    <p class="mono brand-foot">Lindsey Monyepao &middot; Admin</p>
+  </aside>
+
   <div class="login-card">
-    <h1>Admin Access</h1>
-    <p class="subtitle">Enter password to unlock edit mode</p>
+    <span class="mono index">(00) Restricted</span>
+    <h1>Admin <em>access</em></h1>
+    <p class="subtitle">Enter the password to unlock edit mode.</p>
 
     <form (ngSubmit)="login()">
       <div class="form-group">
@@ -9,21 +16,19 @@
           type="password"
           [(ngModel)]="password"
           name="password"
-          placeholder="Enter admin password"
+          placeholder="Password"
           [disabled]="loading"
           autocomplete="current-password"
         />
       </div>
 
-      <div class="error" *ngIf="error">
+      <div class="error mono" *ngIf="error">
         {{ error }}
       </div>
 
       <button type="submit" [disabled]="loading">
-        {{ loading ? 'Logging in...' : 'Enter Admin Mode' }}
+        {{ loading ? 'Logging in...' : 'Enter admin mode →' }}
       </button>
     </form>
-
-    <a routerLink="/" class="back-link">← Back to Portfolio</a>
   </div>
 </div>

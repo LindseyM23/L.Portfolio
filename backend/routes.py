@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from models import db, SocialLink, About, Skill, Service, Certification, WorkExperience, ExperienceSkill, Project, KPI, Contact
 from datetime import datetime
 import jwt
+import json
 import os
 
 api_bp = Blueprint('api', __name__)
@@ -279,16 +280,29 @@ def delete_experience_skill(id):
     db.session.commit()
     return jsonify({'message': 'Deleted'}), 200
 
+def project_images(p):
+    images = json.loads(p.images) if p.images else []
+    # Fall back to the legacy single image
+    return images or ([p.image] if p.image else [])
+
+def project_to_dict(p):
+    images = project_images(p)
+    return {'id': p.id, 'name': p.name, 'description': p.description, 'image': images[0] if images else None, 'images': images, 'live_url': p.live_url, 'github_url': p.github_url, 'technologies': p.technologies, 'order': p.order}
+
 @api_bp.route('/projects', methods=['GET'])
 def get_projects():
     projects = Project.query.order_by(Project.order).all()
-    return jsonify([{'id': p.id, 'name': p.name, 'description': p.description, 'image': p.image, 'live_url': p.live_url, 'github_url': p.github_url, 'technologies': p.technologies, 'order': p.order} for p in projects]), 200
+    return jsonify([project_to_dict(p) for p in projects]), 200
+
+@api_bp.route('/projects/<int:id>', methods=['GET'])
+def get_project(id):
+    return jsonify(project_to_dict(Project.query.get_or_404(id))), 200
 
 @api_bp.route('/projects', methods=['POST'])
 @admin_required
 def create_project():
     data = request.get_json()
-    project = Project(name=data['name'], description=data['description'], image=data.get('image'), live_url=data.get('live_url'), github_url=data.get('github_url'), technologies=data.get('technologies'), order=data.get('order', 0))
+    project = Project(name=data['name'], description=data['description'], image=data.get('image'), images=json.dumps(data.get('images') or []), live_url=data.get('live_url'), github_url=data.get('github_url'), technologies=data.get('technologies'), order=data.get('order', 0))
     db.session.add(project)
     db.session.commit()
     return jsonify({'id': project.id}), 201
@@ -301,6 +315,8 @@ def update_project(id):
     for key in ['name', 'description', 'image', 'live_url', 'github_url', 'technologies', 'order']:
         if key in data:
             setattr(project, key, data[key])
+    if 'images' in data:
+        project.images = json.dumps(data['images'] or [])
     db.session.commit()
     return jsonify({'message': 'Updated'}), 200
 
@@ -339,8 +355,9 @@ def update_kpi(id):
     for key in ['title', 'description', 'status', 'visibility', 'order']:
         if key in data:
             setattr(kpi, key, data[key])
-    if data.get('target_date'):
-        kpi.target_date = datetime.fromisoformat(data['target_date'])
+    if 'target_date' in data:
+        # An empty value clears the date
+        kpi.target_date = datetime.fromisoformat(data['target_date']).date() if data['target_date'] else None
     db.session.commit()
     return jsonify({'message': 'Updated'}), 200
 

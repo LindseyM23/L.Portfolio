@@ -1,10 +1,26 @@
 /* Global Styles - Using Centralized Theme */
 @import 'theme.scss';
 
+:root {
+  --bg: #{$white};
+  --fg: #{$black};
+  --muted: rgba(10, 10, 10, 0.58);
+  --line: rgba(10, 10, 10, 0.14);
+  // Filters for the black SVG icons in /assets/icons
+  --icon-on-fg: invert(1);
+  --icon-on-bg: none;
+  color-scheme: light;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: $header-height;
 }
 
 body {
@@ -13,39 +29,62 @@ body {
   line-height: 1.6;
   color: $text-primary;
   background: $bg-primary;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-html, body {
-  height: 100%;
-  scroll-behavior: smooth;
+// Film-grain overlay for a printed, tactile feel
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: $z-tooltip;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--bg);
 }
 
 h1, h2, h3, h4, h5, h6 {
+  font-family: $font-display;
   font-weight: $font-weight-bold;
-  line-height: 1.2;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 h1 { font-size: $font-size-h1; }
 h2 { font-size: $font-size-h2; }
 h3 { font-size: $font-size-h3; }
 
+em, .serif {
+  font-family: $font-serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
 button {
   @include button-base;
 }
 
 a {
-  color: $text-primary;
+  color: inherit;
   text-decoration: none;
-  transition: opacity $transition-fast;
-  
-  &:hover {
-    opacity: 0.7;
-  }
 }
 
-// Utility classes
+img { max-width: 100%; }
+
+// ========== Layout helpers ==========
 .container {
   @include section-container;
+}
+
+.dark {
+  @include invert;
 }
 
 .card {
@@ -56,30 +95,224 @@ a {
   @include flex-center;
 }
 
-// Admin mode styles
-.admin-edit-btn {
-  position: absolute;
-  top: $spacing-sm;
-  right: $spacing-sm;
-  @include button-base;
-  padding: $spacing-xs $spacing-sm;
-  font-size: 14px;
-  opacity: 0.8;
-  
-  &:hover {
-    opacity: 1;
+.mono {
+  @include mono-label;
+}
+
+// ========== Section heading ==========
+// <header class="section-head">
+//   <span class="section-index">(01)</span>
+//   <h2 class="section-title">About <em>me</em></h2>
+//   <p class="section-kicker">…</p>
+// </header>
+.section-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: $spacing-sm $spacing-lg;
+  padding-bottom: $spacing-lg;
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+  border-bottom: $border-width solid var(--line);
+
+  .section-index {
+    @include mono-label;
+    color: var(--muted);
+    align-self: start;
+    padding-top: 0.6em;
+  }
+
+  .section-title {
+    font-size: $font-size-h2;
+    text-transform: uppercase;
+    margin: 0;
+    text-align: left;
+  }
+
+  .section-kicker {
+    grid-column: 2;
+    max-width: 46ch;
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+
+  @media (max-width: $bp-mobile) {
+    grid-template-columns: 1fr;
+
+    .section-kicker { grid-column: 1; }
   }
 }
 
+// ========== Icons ==========
+.ico {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  filter: var(--icon-on-fg);
+}
+
+.ico-bg {
+  filter: var(--icon-on-bg);
+}
+
+// ========== Forms (admin editing) ==========
+input, textarea, select {
+  width: 100%;
+  padding: 14px 16px;
+  font-family: $font-family;
+  font-size: 15px;
+  color: var(--fg);
+  background: transparent;
+  border: $border-width solid var(--line);
+  border-radius: 12px;
+  transition: border-color $transition-fast;
+
+  &::placeholder { color: var(--muted); }
+
+  &:focus {
+    outline: none;
+    border-color: var(--fg);
+  }
+}
+
+select option {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+input[type='date'] {
+  cursor: pointer;
+
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.8;
+
+    &:hover { opacity: 1; }
+  }
+}
+
+.btn-ghost {
+  @include button-ghost;
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+}
+
+// Dashed "add" tile used across sections in admin mode
+.add-tile {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-xs;
+  min-height: 160px;
+  border: 2px dashed var(--line);
+  border-radius: $border-radius;
+  color: var(--muted);
+  cursor: pointer;
+  @include mono-label;
+  transition: border-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    border-color: var(--fg);
+    color: var(--fg);
+  }
+}
+
+// Stacked admin form panel
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  max-width: 640px;
+  margin: $spacing-xl auto 0;
+  padding: $spacing-lg;
+  border: $border-width solid var(--fg);
+  border-radius: $border-radius;
+
+  h3, h4 {
+    @include mono-label;
+    font-family: $font-mono;
+    margin-bottom: $spacing-xs;
+  }
+
+  label {
+    @include mono-label;
+    color: var(--muted);
+  }
+}
+
+.admin-actions {
+  display: flex;
+  gap: $spacing-xs;
+  margin-top: $spacing-sm;
+
+  button {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+}
+
+// ========== Scroll reveal (see RevealDirective) ==========
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.9s $ease-out, transform 0.9s $ease-out;
+  transition-delay: var(--reveal-delay, 0s);
+
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+// ========== Admin mode indicator ==========
 .admin-indicator {
   position: fixed;
-  top: $spacing-sm;
-  right: $spacing-sm;
-  background: $button-bg;
-  color: $button-text;
-  padding: $spacing-xs $spacing-md;
-  border-radius: $border-radius;
-  font-size: 14px;
-  font-weight: $font-weight-bold;
+  bottom: $spacing-md;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: $black;
+  color: $white;
+  padding: 10px 20px;
+  border: 1px solid $white;
+  border-radius: $pill;
+  @include mono-label;
   z-index: $z-header + 1;
+
+  .pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $white;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.6); }
 }

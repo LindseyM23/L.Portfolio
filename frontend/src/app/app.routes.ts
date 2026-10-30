@@ -13,5 +13,9 @@ export const routes: Routes = [
     path: 'experience/:id', 
     loadComponent: () => import('./pages/experience-detail/experience-detail.component').then(m => m.ExperienceDetailComponent)
   },
+  { 
+    path: 'projects/:id', 
+    loadComponent: () => import('./pages/project-detail/project-detail.component').then(m => m.ProjectDetailComponent)
+  },
   { path: '**', redirectTo: '' }
 ];

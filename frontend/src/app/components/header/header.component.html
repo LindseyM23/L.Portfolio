@@ -1,18 +1,32 @@
+<div class="progress" [style.transform]="'scaleX(' + scrollProgress + ')'"></div>
+
 <header class="header" [class.scrolled]="isScrolled">
   <div class="header-container">
-    <div class="logo" (click)="scrollTo('hero')">
-      <img src="../../../assets/icons/letter-l.svg" width="40px" alt="Logo">
-    </div>
+    <button class="logo" (click)="scrollTo('hero')" aria-label="Back to top">
+      <img src="assets/icons/letter-l.svg" alt="Logo">
+      <span class="logo-text">Lindsey<br>Monyepao</span>
+    </button>
 
     <nav class="nav">
-      <a *ngFor="let link of navLinks" (click)="scrollTo(link.target)" class="nav-link">
-        {{ link.label }}
+      <a *ngFor="let link of navLinks; let i = index" (click)="scrollTo(link.target)" class="nav-link">
+        <span class="nav-index">0{{ i + 1 }}</span>{{ link.label }}
       </a>
     </nav>
 
     <div class="header-actions">
-      <a *ngIf="!isAdmin" routerLink="/admin" class="admin-link">Admin</a>
-      <button *ngIf="isAdmin" (click)="logout()" class="logout-btn">Logout</button>
+      <a *ngIf="!isAdmin" routerLink="/admin" class="pill">Admin</a>
+      <button *ngIf="isAdmin" (click)="logout()" class="pill">Logout</button>
+      <button class="burger" [class.open]="menuOpen" (click)="menuOpen = !menuOpen" aria-label="Toggle menu">
+        <span></span><span></span>
+      </button>
     </div>
   </div>
 </header>
+
+<div class="menu-overlay" [class.open]="menuOpen">
+  <nav>
+    <a *ngFor="let link of navLinks; let i = index" (click)="scrollTo(link.target)" [style.transition-delay]="(menuOpen ? 0.1 + i * 0.05 : 0) + 's'">
+      <span class="nav-index">0{{ i + 1 }}</span>{{ link.label }}
+    </a>
+  </nav>
+</div>

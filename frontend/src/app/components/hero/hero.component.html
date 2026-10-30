@@ -1,64 +1,107 @@
 <section class="hero">
   <div class="hero-container">
-    <div class="hero-left">
-      <h1>Lindsey Monyepao</h1>
-      <p class="tagline">{{ typedText }}<span class="cursor">|</span></p>
-      
-      <div class="social-links">
-        <a *ngFor="let link of socialLinks" 
-           [href]="link.url" 
-           target="_blank" 
-           class="social-link"
-           [title]="link.platform">
-          <img [src]="getPlatformIcon(link.platform)" 
-               [alt]="link.platform + ' icon'" 
-               class="social-icon"
-               (error)="onImageError($event)" />
-          
-          <button *ngIf="isAdmin" 
-                  class="delete-btn" 
-                  (click)="deleteLink(link.id!); $event.preventDefault()">
-            ✕
-          </button>
-        </a>
+    <div class="meta-row">
+      <span class="mono">Portfolio &copy;{{ year }}</span>
+      <span class="mono">{{ location || 'South Africa' }}</span>
+      <span class="mono status"><span class="dot"></span>Open to opportunities</span>
+    </div>
 
-        <button *ngIf="isAdmin && !addingLink" 
-                (click)="addingLink = true" 
-                class="add-btn">
-          + Add Social Link
-        </button>
+    <h1 class="name">
+      <span class="line"><span>Lindsey</span></span>
+      <span class="line indent"><span><em>Monyepao</em></span></span>
+    </h1>
+
+    <div class="hero-bottom">
+      <div class="hero-left">
+        <p class="tagline mono">
+          <span class="prompt">&gt;</span>{{ typedText }}<span class="cursor"></span>
+        </p>
+
+        <div class="social-links">
+          <a *ngFor="let link of socialLinks"
+             [href]="link.url"
+             target="_blank"
+             rel="noopener"
+             class="social-link"
+             [title]="link.platform">
+            <img [src]="getPlatformIcon(link.platform)"
+                 [alt]="link.platform + ' icon'"
+                 class="social-icon"
+                 (error)="onImageError($event)" />
+            <span class="social-label">{{ link.platform }}</span>
+
+            <button *ngIf="isAdmin"
+                    class="delete-btn"
+                    (click)="deleteLink(link.id!); $event.preventDefault()">
+              ✕
+            </button>
+          </a>
+
+          <button *ngIf="isAdmin && !addingLink"
+                  (click)="addingLink = true"
+                  class="btn-ghost btn-sm">
+            + Add link
+          </button>
+        </div>
+
+        <div *ngIf="isAdmin && addingLink" class="add-form">
+          <input [(ngModel)]="newLink.platform" placeholder="Platform (e.g., GitHub)" />
+          <input [(ngModel)]="newLink.url" placeholder="URL" />
+          <div class="btn-row">
+            <button (click)="addLink()">Save</button>
+            <button class="btn-ghost" (click)="addingLink = false">Cancel</button>
+          </div>
+        </div>
       </div>
 
-      <div *ngIf="isAdmin && addingLink" class="add-form">
-        <input [(ngModel)]="newLink.platform" placeholder="Platform (e.g., GitHub)" />
-        <input [(ngModel)]="newLink.url" placeholder="URL" />
-        <button (click)="addLink()">Save</button>
-        <button (click)="addingLink = false">Cancel</button>
+      <div class="hero-right">
+        <div class="profile-frame">
+          <img *ngIf="about.profile_image"
+               [src]="about.profile_image"
+               alt="Lindsey Monyepao"
+               class="profile-image" />
+          <div *ngIf="!about.profile_image" class="profile-placeholder">
+            <img src="assets/icons/camera.svg" alt="" class="placeholder-icon" />
+            <p class="mono">No photo</p>
+          </div>
+
+          <svg class="badge" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <path id="badge-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
+            </defs>
+            <circle cx="100" cy="100" r="100" />
+            <text>
+              <textPath href="#badge-circle">BUILD &#x2726; DESIGN &#x2726; DEPLOY &#x2726; SCALE &#x2726;</textPath>
+            </text>
+            <path class="arrow" d="M88 88 L114 114 M114 92 L114 114 L92 114" />
+          </svg>
+
+          <div *ngIf="isAdmin" class="image-upload">
+            <input type="file"
+                   #fileInput
+                   (change)="onImageUpload($event)"
+                   accept="image/*"
+                   hidden />
+            <button (click)="fileInput.click()" [disabled]="uploadingImage" class="btn-sm">
+              <img src="assets/icons/camera.svg" alt="" class="ico" />
+              {{ uploadingImage ? 'Uploading...' : 'Change photo' }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="hero-right">
-      <div class="profile-image-container">
-        <img *ngIf="about.profile_image" 
-             [src]="about.profile_image" 
-             alt="Profile" 
-             class="profile-image" />
-        <div *ngIf="!about.profile_image" class="profile-placeholder">
-          <img src="/assets/icons/camera.svg" alt="Camera icon" class="placeholder-icon" />
-          <p>No photo</p>
-        </div>
-
-        <div *ngIf="isAdmin" class="image-upload">
-          <input type="file" 
-                 #fileInput 
-                 (change)="onImageUpload($event)" 
-                 accept="image/*" 
-                 style="display: none;" />
-          <button (click)="fileInput.click()" [disabled]="uploadingImage">
-            {{ uploadingImage ? 'Uploading...' : 'Change Photo' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <a class="scroll-cue mono" href="#about">
+      <span>Scroll</span>
+      <span class="scroll-line"></span>
+    </a>
   </div>
 </section>
+
+<div class="marquee dark" aria-hidden="true">
+  <div class="marquee-track">
+    <ng-container *ngFor="let _ of [0, 1]">
+      <span *ngFor="let title of titles" class="marquee-item">{{ title }}<span class="star">&#x2726;</span></span>
+    </ng-container>
+  </div>
+</div>
