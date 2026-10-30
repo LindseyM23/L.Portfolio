@@ -18,7 +18,9 @@ import getpass
 import os
 import sys
 
+import certifi
 from sqlalchemy import create_engine, func, select, text
+from sqlalchemy.exc import ArgumentError, OperationalError
 
 BACKEND = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BACKEND)
@@ -36,7 +38,9 @@ def normalise(url):
             url = 'postgresql+psycopg2://' + url[len(prefix):]
     is_local = '@localhost' in url or '@127.0.0.1' in url
     if url.startswith('postgresql') and 'sslmode=' not in url and not is_local:
-        url += ('&' if '?' in url else '?') + 'sslmode=require'
+        # Verify the server's certificate and hostname against the standard
+        # trusted authorities (ignores any stray ~/.postgresql/root.crt)
+        url += ('&' if '?' in url else '?') + f'sslmode=verify-full&sslrootcert={certifi.where()}'
     return url
 
 
@@ -103,5 +107,26 @@ def main():
     print('\nDone. Every table matches the local database.')
 
 
+def explain(error):
+    message = str(getattr(error, 'orig', error)).strip().splitlines()[0]
+    hints = {
+        'could not translate host name': "The host wasn't found. Use the *External* Database URL "
+                                         '(its host ends in ".render.com"), not the Internal one.',
+        'password authentication failed': 'The password in the URL was rejected. Copy the External URL again from Render.',
+        'channel binding': 'The login was rejected. Copy the External URL again from Render '
+                           '(if you reset the password, use the new URL).',
+        'timeout': "Couldn't reach the database. In Render, check portfolio-db -> Access Control allows your IP.",
+        'Connection refused': "Couldn't reach the database. In Render, check portfolio-db -> Access Control allows your IP.",
+        'SSL': 'SSL problem. Make sure you pasted the full External Database URL.',
+        'does not exist': 'The database name in the URL is wrong. Copy the External URL again from Render.',
+    }
+    hint = next((h for key, h in hints.items() if key.lower() in message.lower()),
+                'Check that you pasted the full External Database URL (it starts with postgresql://).')
+    return f'\nCould not connect to the target database. Nothing was changed.\n  Reason: {message}\n  Fix:    {hint}'
+
+
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except (OperationalError, ArgumentError) as error:
+        sys.exit(explain(error))

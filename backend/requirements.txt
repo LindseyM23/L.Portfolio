@@ -8,3 +8,4 @@ Werkzeug==3.0.1
 PyJWT==2.8.0
 gunicorn==22.0.0
 psycopg2-binary==2.9.9
+certifi==2026.10.23
