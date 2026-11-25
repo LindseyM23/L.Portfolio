@@ -253,26 +253,46 @@
       "technologies": null
     },
     {
-      "id": 4,
-      "name": "J.C Sambo Attorneys Website",
-      "live_url": "https://jcsambo.netlify.app/",
-      "github_url": "git@github.com:LindseyM23/J.CSambo-website.git",
-      "technologies": "React, Vite, React Router, Netlify",
       "description": "J.C Sambo Attorneys Website | Law Firm Website and Client Enquiry Platform\nJ.C Sambo Attorneys Inc.\n\nAbout the project\n\nJ.C Sambo Attorneys Inc. is a South African law firm with offices in Polokwane and Nelspruit. The website is the firm’s main online presence, presenting its practice areas, values and contact details to people looking for legal help. It is designed to feel trustworthy and approachable, explain the law in plain language and make it easy for clients to get in touch, including for urgent matters such as arrests over weekends.\n\nMy role\n\nWeb Designer and Front-End Developer\n\nWhat I contributed\n\nDesign and branding: designed a refined, editorial look with a warm bronze palette, classical imagery and elegant typography that reflects the firm’s professionalism and its promise of “Your Attorney. Your Ally.”\nFront-end development: built a fast, responsive single-page site in React with Vite and React Router, covering Home, About Us, What We Do and Contact pages\nPractice areas: structured 14 areas of law into 4 disciplines, with a filterable practice index and detailed descriptions so visitors can quickly find the help they need\nContent and messaging: wrote and organised client-focused content, including the firm’s story, values (integrity, confidentiality, accountability and transparency) and community commitment\nClient enquiries: built a contact page with telephone, office details and an enquiry form that sends matters directly to the firm, with clear guidance for urgent cases\nSEO and deployment: added search and social sharing metadata and deployed the site on Netlify\n\nSkills demonstrated\n\nWeb design, React front-end development, responsive layout, UX and content structure, copywriting, SEO, deployment",
-      "image": "assets/fallback/media/jcsambo-01.jpg",
+      "github_url": "git@github.com:LindseyM23/J.CSambo-website.git",
+      "id": 4,
+      "image": "assets/fallback/media/7a4d23b31c3cd34a25adcb82f1bd082b.jpg",
       "images": [
-        "assets/fallback/media/jcsambo-01.jpg",
-        "assets/fallback/media/jcsambo-02.jpg",
-        "assets/fallback/media/jcsambo-03.jpg",
-        "assets/fallback/media/jcsambo-04.jpg",
-        "assets/fallback/media/jcsambo-05.jpg",
-        "assets/fallback/media/jcsambo-06.jpg",
-        "assets/fallback/media/jcsambo-07.jpg",
-        "assets/fallback/media/jcsambo-08.jpg",
-        "assets/fallback/media/jcsambo-09.jpg",
-        "assets/fallback/media/jcsambo-10.jpg"
+        "assets/fallback/media/7a4d23b31c3cd34a25adcb82f1bd082b.jpg",
+        "assets/fallback/media/1fdecbb58678051475b2759bd9a230dd.jpg",
+        "assets/fallback/media/59548a4467d93c946698143d96601f99.jpg",
+        "assets/fallback/media/cef12e416252779859cdbaf1b229ee67.jpg",
+        "assets/fallback/media/cfded19115b9924c52d1abea205422d2.jpg",
+        "assets/fallback/media/6035ba4d93b53975f5b877b0e200efac.jpg",
+        "assets/fallback/media/45dedb32e35fe62c1fa6b70425ad02c8.jpg",
+        "assets/fallback/media/c4c6c8641ed17197b175f3152157b9b2.jpg",
+        "assets/fallback/media/56f6411df2eb2d7662b1292caf3fb605.jpg",
+        "assets/fallback/media/3f1dfafad00ce5e427a6a96efbd4ff12.jpg"
       ],
-      "order": 2
+      "live_url": "https://jcsambo.netlify.app/",
+      "name": "J.C Sambo Attorneys Website",
+      "order": 2,
+      "technologies": "React, Vite, React Router, Netlify"
+    },
+    {
+      "description": "Delight Softies Website | Tissue Brand Website and Product Showcase\nDelight Softies\n\nAbout the project\n\nDelight Softies is a proudly South African tissue brand based in Polokwane, making 2-ply virgin pulp toilet rolls and other everyday tissue products that are sold in local stores such as SPAR and Best Price. The website is the brand’s main online presence, introducing the brand, showcasing its product range and community, and making it easy for households and businesses to place orders.\n\nMy role\n\nWeb Designer and Front-End Developer\n\nWhat I contributed\n\nDesign and branding: designed a soft, airy look built around the brand’s blue palette, script logo and floral packaging, so the site feels like a natural extension of the product\nFront-end development: built a responsive single-page site in React with Vite and React Router, with Home, About, Products and Contact sections and smooth, animated details such as a scrolling feature banner\nProduct showcase: presented the range, including the 18 pack 2 ply rolls, facial tissues, garage rolls and napkins, with clear “Available now” and “Coming soon” states and order calls to action\nBrand story and trust: added an about section, key stats (happy clients, employees and years of experience) and a community gallery showing the products on shelves and in the hands of the team\nCustomer engagement: included free delivery messaging, a newsletter sign-up, an Instagram link, business hours and contact details to turn visitors into customers\nDeployment: set up the site on the brand’s own domain, delightsofties.co.za\n\nSkills demonstrated\n\nWeb design, brand-led UI, React front-end development, responsive layout, content structure, copywriting, deployment",
+      "github_url": "git@github.com:LindseyM23/DelightSofities-Website2.git",
+      "id": 5,
+      "image": "assets/fallback/media/42e62d4d49cfea7f729c0677b7759c28.jpg",
+      "images": [
+        "assets/fallback/media/42e62d4d49cfea7f729c0677b7759c28.jpg",
+        "assets/fallback/media/485bc132e8f05fcda4252dcb8cc331aa.jpg",
+        "assets/fallback/media/0a0ba419b6307ebc0431c5bb1baa5bd8.jpg",
+        "assets/fallback/media/22b02c3cc2f932c523de3d27ca3562c6.jpg",
+        "assets/fallback/media/bcf4e017a443a29fe06261c44da5dd23.jpg",
+        "assets/fallback/media/07414adce88181b6523080e3ce78c6b4.jpg",
+        "assets/fallback/media/d41d1b6cbf11588cff704e0dd46ca5fc.jpg",
+        "assets/fallback/media/d9f89f5d7c54fe4e209d4d5a3d1679a0.jpg"
+      ],
+      "live_url": "https://delightsofties.co.za/",
+      "name": "Delight Softies Website",
+      "order": 3,
+      "technologies": "React, Vite, React Router, Netlify"
     },
     {
       "description": "BlinkHub | AI-Integrated Vendor Management and Procurement Platform\nProcureSense\n\nAbout the project\n\nBlinkHub is a cloud-based vendor management and procurement platform that helps organisations find, onboard and manage suppliers in one place. It connects clients and vendors through dedicated portals, streamlines procurement workflows and uses AI-assisted features to support smarter, faster and more compliant purchasing decisions.\n\nMy role\n\nJunior Software Engineer, Scrum Master and Product Documentation Lead\n\nWhat I contributed\n\nDevelopment: built and maintained front-end and back-end components, implemented features that improved system performance and user experience, and worked with senior developers on scalable, maintainable code and cloud integration\nAgile delivery: facilitated all Scrum ceremonies for the team, managed backlog refinement with stakeholders, removed blockers and tracked sprint progress to keep releases on schedule\nTraining and documentation: wrote and structured comprehensive client and vendor training manuals covering all major platform modules, with clear step-by-step navigation and functional feature descriptions\nDocumentation pipeline: designed a process to keep documentation current with a fast-changing feature set, including a developer submission template, an approval workflow and a standard feature documentation template\nProduct and stakeholder support: wrote product demo scripts and client and partner correspondence\n\nSkills demonstrated\n\nFull-stack development, cloud integration, Scrum and Kanban facilitation, technical writing, process design, stakeholder communication",
@@ -282,7 +302,7 @@
       "images": [],
       "live_url": null,
       "name": "BlinkHub",
-      "order": 3,
+      "order": 4,
       "technologies": null
     }
   ],
