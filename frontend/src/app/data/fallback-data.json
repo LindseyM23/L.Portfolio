@@ -212,17 +212,6 @@
   ],
   "projects": [
     {
-      "description": "BlinkHub | AI-Integrated Vendor Management and Procurement Platform\nProcureSense\n\nAbout the project\n\nBlinkHub is a cloud-based vendor management and procurement platform that helps organisations find, onboard and manage suppliers in one place. It connects clients and vendors through dedicated portals, streamlines procurement workflows and uses AI-assisted features to support smarter, faster and more compliant purchasing decisions.\n\nMy role\n\nJunior Software Engineer, Scrum Master and Product Documentation Lead\n\nWhat I contributed\n\nDevelopment: built and maintained front-end and back-end components, implemented features that improved system performance and user experience, and worked with senior developers on scalable, maintainable code and cloud integration\nAgile delivery: facilitated all Scrum ceremonies for the team, managed backlog refinement with stakeholders, removed blockers and tracked sprint progress to keep releases on schedule\nTraining and documentation: wrote and structured comprehensive client and vendor training manuals covering all major platform modules, with clear step-by-step navigation and functional feature descriptions\nDocumentation pipeline: designed a process to keep documentation current with a fast-changing feature set, including a developer submission template, an approval workflow and a standard feature documentation template\nProduct and stakeholder support: wrote product demo scripts and client and partner correspondence\n\nSkills demonstrated\n\nFull-stack development, cloud integration, Scrum and Kanban facilitation, technical writing, process design, stakeholder communication",
-      "github_url": null,
-      "id": 2,
-      "image": null,
-      "images": [],
-      "live_url": null,
-      "name": "BlinkHub",
-      "order": 0,
-      "technologies": null
-    },
-    {
       "description": "Delight Express Shuttle App | Multi-Company Fleet and Logistics Management Platform\nDelight Express\n\nAbout the project\n\nThe Delight Express Shuttle App is a digital platform that streamlines fleet operations across multiple companies. It brings logistics contracts, vehicle tracking and real-time reporting into one system, giving every stakeholder clear visibility of operations. The app helps optimise fleet utilisation and includes financial performance monitoring so management can make data-driven decisions.\n\nMy role\n\nSoftware Engineer\n\nWhat I contributed\n\nFeature development: built scalable, user-friendly features that improve operational efficiency and the overall transportation experience\nFleet and contract management: contributed to features for managing logistics contracts and vehicle activity across multiple companies from a single platform\nTracking and reporting: supported real-time vehicle tracking and reporting so stakeholders have transparent, up-to-date information\nFinancial insight: helped integrate financial performance monitoring to connect fleet activity with business results\nPlatform setup and support: configured and troubleshot the domain email setup for delightexpress.co.za, including diagnosing SMTP issues with the hosting provider\n\nSkills demonstrated\n\nFull-stack development, logistics and fleet systems, real-time data and reporting, user-centred design, technical troubleshooting\n\nA couple of quick checks before you publish:\n\nI listed your role as “Software Engineer”. Change it if you had a different title, or add “Scrum Master” if you also ran the agile process on this project.\nThe middle three bullets describe the app’s main features as areas you worked on. If you focused on only some of them, remove the ones you didn’t touch so the entry stays accurate.",
       "github_url": "git@github.com:LindseyM23/ShuttleD.git",
       "id": 1,
@@ -260,7 +249,40 @@
       ],
       "live_url": "https://aurorastudios23.netlify.app/",
       "name": "Aurora Studios Website",
-      "order": 0,
+      "order": 1,
+      "technologies": null
+    },
+    {
+      "id": 4,
+      "name": "J.C Sambo Attorneys Website",
+      "live_url": "https://jcsambo.netlify.app/",
+      "github_url": "git@github.com:LindseyM23/J.CSambo-website.git",
+      "technologies": "React, Vite, React Router, Netlify",
+      "description": "J.C Sambo Attorneys Website | Law Firm Website and Client Enquiry Platform\nJ.C Sambo Attorneys Inc.\n\nAbout the project\n\nJ.C Sambo Attorneys Inc. is a South African law firm with offices in Polokwane and Nelspruit. The website is the firm’s main online presence, presenting its practice areas, values and contact details to people looking for legal help. It is designed to feel trustworthy and approachable, explain the law in plain language and make it easy for clients to get in touch, including for urgent matters such as arrests over weekends.\n\nMy role\n\nWeb Designer and Front-End Developer\n\nWhat I contributed\n\nDesign and branding: designed a refined, editorial look with a warm bronze palette, classical imagery and elegant typography that reflects the firm’s professionalism and its promise of “Your Attorney. Your Ally.”\nFront-end development: built a fast, responsive single-page site in React with Vite and React Router, covering Home, About Us, What We Do and Contact pages\nPractice areas: structured 14 areas of law into 4 disciplines, with a filterable practice index and detailed descriptions so visitors can quickly find the help they need\nContent and messaging: wrote and organised client-focused content, including the firm’s story, values (integrity, confidentiality, accountability and transparency) and community commitment\nClient enquiries: built a contact page with telephone, office details and an enquiry form that sends matters directly to the firm, with clear guidance for urgent cases\nSEO and deployment: added search and social sharing metadata and deployed the site on Netlify\n\nSkills demonstrated\n\nWeb design, React front-end development, responsive layout, UX and content structure, copywriting, SEO, deployment",
+      "image": "assets/fallback/media/jcsambo-01.jpg",
+      "images": [
+        "assets/fallback/media/jcsambo-01.jpg",
+        "assets/fallback/media/jcsambo-02.jpg",
+        "assets/fallback/media/jcsambo-03.jpg",
+        "assets/fallback/media/jcsambo-04.jpg",
+        "assets/fallback/media/jcsambo-05.jpg",
+        "assets/fallback/media/jcsambo-06.jpg",
+        "assets/fallback/media/jcsambo-07.jpg",
+        "assets/fallback/media/jcsambo-08.jpg",
+        "assets/fallback/media/jcsambo-09.jpg",
+        "assets/fallback/media/jcsambo-10.jpg"
+      ],
+      "order": 2
+    },
+    {
+      "description": "BlinkHub | AI-Integrated Vendor Management and Procurement Platform\nProcureSense\n\nAbout the project\n\nBlinkHub is a cloud-based vendor management and procurement platform that helps organisations find, onboard and manage suppliers in one place. It connects clients and vendors through dedicated portals, streamlines procurement workflows and uses AI-assisted features to support smarter, faster and more compliant purchasing decisions.\n\nMy role\n\nJunior Software Engineer, Scrum Master and Product Documentation Lead\n\nWhat I contributed\n\nDevelopment: built and maintained front-end and back-end components, implemented features that improved system performance and user experience, and worked with senior developers on scalable, maintainable code and cloud integration\nAgile delivery: facilitated all Scrum ceremonies for the team, managed backlog refinement with stakeholders, removed blockers and tracked sprint progress to keep releases on schedule\nTraining and documentation: wrote and structured comprehensive client and vendor training manuals covering all major platform modules, with clear step-by-step navigation and functional feature descriptions\nDocumentation pipeline: designed a process to keep documentation current with a fast-changing feature set, including a developer submission template, an approval workflow and a standard feature documentation template\nProduct and stakeholder support: wrote product demo scripts and client and partner correspondence\n\nSkills demonstrated\n\nFull-stack development, cloud integration, Scrum and Kanban facilitation, technical writing, process design, stakeholder communication",
+      "github_url": null,
+      "id": 2,
+      "image": null,
+      "images": [],
+      "live_url": null,
+      "name": "BlinkHub",
+      "order": 3,
       "technologies": null
     }
   ],
