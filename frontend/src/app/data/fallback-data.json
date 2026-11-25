@@ -1,0 +1,305 @@
+{
+  "socialLinks": [
+    {
+      "icon": null,
+      "id": 1,
+      "order": 0,
+      "platform": "Github",
+      "url": "https://github.com/LindseyM23"
+    },
+    {
+      "icon": null,
+      "id": 2,
+      "order": 0,
+      "platform": "LinkedIn",
+      "url": "https://www.linkedin.com/in/lindseym23/"
+    },
+    {
+      "icon": null,
+      "id": 3,
+      "order": 0,
+      "platform": "CV",
+      "url": "https://acrobat.adobe.com/id/urn:aaid:sc:EU:9e3c78e9-c4d2-4201-af03-12783b9ff2b7"
+    }
+  ],
+  "about": {
+    "id": 1,
+    "overview": "I’m Lindsey, a full stack developer who likes to understand the whole picture: the code, the people, and the process that holds them together. I build clean, practical solutions from the database all the way to the button you click, and I’m just as comfortable leading a stand-up as I am debugging at midnight. I’m a certified cloud architect and a Scrum Master in the making, with a business analyst’s habit of asking “but why?” until the real problem shows up. I’m curious by nature, organised by choice, and happiest when I’m turning messy ideas into things that actually work.",
+    "profile_image": "assets/fallback/media/e76ad1bdb1a03e4de12a425c46f2e03c.jpg"
+  },
+  "skills": [
+    {
+      "category": null,
+      "icon": "assets/fallback/media/d44571a17a040650e5938e763c5e3972.svg",
+      "id": 1,
+      "name": "HTML",
+      "order": 0
+    },
+    {
+      "category": null,
+      "icon": "assets/fallback/media/3ac8ff4709620cab3d55df01968944e7.svg",
+      "id": 2,
+      "name": "CSS",
+      "order": 0
+    },
+    {
+      "category": null,
+      "icon": "assets/fallback/media/2d9add6326f08ad9d56d6d76cadbeeb4.svg",
+      "id": 3,
+      "name": "Angular",
+      "order": 0
+    },
+    {
+      "category": null,
+      "icon": "assets/fallback/media/fc0fb18937ba61bec2e12f09773293e9.svg",
+      "id": 4,
+      "name": "Python",
+      "order": 0
+    },
+    {
+      "category": null,
+      "icon": "assets/fallback/media/79051e1de8f8bd7631c4d21dfb4f470f.svg",
+      "id": 5,
+      "name": "AWS",
+      "order": 0
+    },
+    {
+      "category": null,
+      "icon": "assets/fallback/media/8fe4cf5d5a93882ad4ba9bb672a0e4d7.svg",
+      "id": 6,
+      "name": "typescript",
+      "order": 0
+    },
+    {
+      "category": null,
+      "icon": "assets/fallback/media/59bd290c9428912113de0f26a43371fc.svg",
+      "id": 7,
+      "name": "react",
+      "order": 0
+    },
+    {
+      "category": null,
+      "icon": "assets/fallback/media/ae446d0ac99776c4ea9becbc4f0ac4dd.svg",
+      "id": 8,
+      "name": "javascript",
+      "order": 0
+    }
+  ],
+  "services": [
+    {
+      "description": "I build responsive, user-friendly websites that are optimized for performance and designed to deliver seamless experiences across all devices.",
+      "icon": null,
+      "id": 1,
+      "order": 0,
+      "title": "Web Development"
+    },
+    {
+      "description": "I develop end-to-end solutions, managing both front-end and back-end systems to create robust, scalable applications that meet complex business needs.",
+      "icon": null,
+      "id": 2,
+      "order": 0,
+      "title": "Full Stack Development"
+    },
+    {
+      "description": "I design and implement cloud-based applications that are secure, scalable, and cost-efficient, leveraging cloud platforms to optimize performance and reliability.",
+      "icon": null,
+      "id": 3,
+      "order": 0,
+      "title": "Cloud Development"
+    },
+    {
+      "description": "I create strategic technology architectures that solve business challenges, optimize processes, and enable innovation. I focus on building systems that are scalable, maintainable, and aligned with organizational goals. (WAR: Well-Architected Review)",
+      "icon": null,
+      "id": 4,
+      "order": 0,
+      "title": "Solutions Architect"
+    },
+    {
+      "description": "I help teams deliver better work, faster, through structured agile practices. I facilitate the full Scrum cycle and adapt agile methods to fit each team, project and business goal.\n\nWhat I do\n\nFacilitate Scrum ceremonies: sprint planning, daily stand-ups, sprint reviews, retrospectives and backlog refinement\nGuide multiple methodologies: Scrum, Kanban and hybrid approaches, chosen to suit the team and the work\nAlign teams and stakeholders: work with product owners and leadership to prioritise the backlog and keep delivery focused on business value\nRemove blockers: identify and resolve obstacles so teams can stay focused and productive\nTrack and report progress: use sprint metrics such as velocity and burndown to keep work transparent and on schedule\nCoach and build culture: support team members in agile principles and promote collaboration, ownership and continuous improvement",
+      "icon": null,
+      "id": 5,
+      "order": 0,
+      "title": "Scrum Master"
+    }
+  ],
+  "certifications": [
+    {
+      "badge_image": "assets/fallback/media/24238ecdda7d772695a380a00d85031d.png",
+      "cert_image": null,
+      "id": 1,
+      "issued_date": "2026-01-25",
+      "issuer": "AWS",
+      "name": "AWS Certified Cloud Practitioner",
+      "order": 0
+    },
+    {
+      "badge_image": "assets/fallback/media/ad13bfb687c68c093503a994064cf478.png",
+      "cert_image": null,
+      "id": 2,
+      "issued_date": "2026-01-25",
+      "issuer": "AWS",
+      "name": "AWS Certified Solutions Architect - Associate",
+      "order": 0
+    },
+    {
+      "badge_image": "assets/fallback/media/291869f40156da98ddf2d81b0ccd1e34.png",
+      "cert_image": null,
+      "id": 3,
+      "issued_date": "2026-01-25",
+      "issuer": "AWS",
+      "name": "AWS Certified Solutions Architect - Professional",
+      "order": 0
+    }
+  ],
+  "experience": [
+    {
+      "company": "Melsoft Academy, Gauteng",
+      "end_date": "2025-12-31",
+      "id": 1,
+      "order": 0,
+      "role": "Web Developer",
+      "skills_acquired": [],
+      "start_date": "2024-09-01",
+      "summary": "Being a Web Developer at Melsoft Academy, my role is to create and maintain web applications using all my programming skills, creating user-friendly interfaces while ensuring functionality and responsiveness of the website throughout multiple screens. I also utilized SEO techniques in my role to ensure that the client’s online presence could be seen."
+    },
+    {
+      "company": "Melsoft Academy, Gauteng",
+      "end_date": "2025-12-31",
+      "id": 2,
+      "order": 0,
+      "role": "Mentor",
+      "skills_acquired": [
+        {
+          "explanation": "cdsc",
+          "id": 1,
+          "order": 0,
+          "skill_name": "cds"
+        }
+      ],
+      "start_date": "2024-08-01",
+      "summary": "As a mentor at Melsoft Academy, my aim was to create beginner-friendly content for students while also ensuring that they get the relevant support while undergoing the bootcamp. I contributed to their professional growth and gave them the relevant advice to ensure that they will be ready for their development careers."
+    },
+    {
+      "company": "Aurora Studios",
+      "end_date": null,
+      "id": 3,
+      "order": 0,
+      "role": "Founder and Managing Director",
+      "skills_acquired": [],
+      "start_date": "2023-01-01",
+      "summary": "As the founder of Aurora Studios, I work with businesses to elevate and transform their operations by designing and implementing tailored digital solutions that directly address the challenges they face. My focus is on creating systems and strategies that improve efficiency, optimize processes, and drive sustainable growth. By aligning technology with business goals, I help organizations leverage innovation to achieve measurable impact and long-term success."
+    },
+    {
+      "company": "ProcureSense",
+      "end_date": "2025-11-30",
+      "id": 4,
+      "order": 0,
+      "role": "Software Engineer Internship",
+      "skills_acquired": [],
+      "start_date": "2024-12-01",
+      "summary": "During my internship at ProcureSense, I contributed to the development of AI-powered solutions and digital platforms that optimize procurement processes for businesses. I worked on both front-end and back-end tasks, collaborating with cross-functional teams to deliver features that improve system efficiency, data accuracy, and user experience. This role allowed me to gain hands-on experience in full-stack development, cloud integration, and practical problem-solving within a fast-paced tech environment."
+    },
+    {
+      "company": "ProcureSense",
+      "end_date": null,
+      "id": 5,
+      "order": 0,
+      "role": "Junior Software Engineer",
+      "skills_acquired": [],
+      "start_date": "2025-12-01",
+      "summary": "As a Junior Software Engineer at ProcureSense, I contributed to building and maintaining digital solutions that streamline procurement operations. I worked on developing robust front-end and back-end components, implementing features that enhance system performance and user experience. Collaborating closely with senior developers, I focused on delivering scalable, maintainable and efficient code while gaining hands-on experience in full-stack development, cloud integration and real-world problem-solving within a dynamic technology environment.\n\nAlongside my development work, I served as the team’s Scrum Master and agile facilitator. I planned and ran all Scrum ceremonies, including sprint planning, daily stand-ups, sprint reviews, retrospectives and backlog refinement, and guided the team across Scrum, Kanban and hybrid approaches. I worked with stakeholders to prioritise the backlog, removed blockers, tracked progress through sprint metrics and promoted a culture of collaboration and continuous improvement. Being both a developer and a facilitator gave me a strong understanding of how technical work and delivery processes connect, which helped the team deliver reliable results on schedule."
+    }
+  ],
+  "projects": [
+    {
+      "description": "BlinkHub | AI-Integrated Vendor Management and Procurement Platform\nProcureSense\n\nAbout the project\n\nBlinkHub is a cloud-based vendor management and procurement platform that helps organisations find, onboard and manage suppliers in one place. It connects clients and vendors through dedicated portals, streamlines procurement workflows and uses AI-assisted features to support smarter, faster and more compliant purchasing decisions.\n\nMy role\n\nJunior Software Engineer, Scrum Master and Product Documentation Lead\n\nWhat I contributed\n\nDevelopment: built and maintained front-end and back-end components, implemented features that improved system performance and user experience, and worked with senior developers on scalable, maintainable code and cloud integration\nAgile delivery: facilitated all Scrum ceremonies for the team, managed backlog refinement with stakeholders, removed blockers and tracked sprint progress to keep releases on schedule\nTraining and documentation: wrote and structured comprehensive client and vendor training manuals covering all major platform modules, with clear step-by-step navigation and functional feature descriptions\nDocumentation pipeline: designed a process to keep documentation current with a fast-changing feature set, including a developer submission template, an approval workflow and a standard feature documentation template\nProduct and stakeholder support: wrote product demo scripts and client and partner correspondence\n\nSkills demonstrated\n\nFull-stack development, cloud integration, Scrum and Kanban facilitation, technical writing, process design, stakeholder communication",
+      "github_url": null,
+      "id": 2,
+      "image": null,
+      "images": [],
+      "live_url": null,
+      "name": "BlinkHub",
+      "order": 0,
+      "technologies": null
+    },
+    {
+      "description": "Delight Express Shuttle App | Multi-Company Fleet and Logistics Management Platform\nDelight Express\n\nAbout the project\n\nThe Delight Express Shuttle App is a digital platform that streamlines fleet operations across multiple companies. It brings logistics contracts, vehicle tracking and real-time reporting into one system, giving every stakeholder clear visibility of operations. The app helps optimise fleet utilisation and includes financial performance monitoring so management can make data-driven decisions.\n\nMy role\n\nSoftware Engineer\n\nWhat I contributed\n\nFeature development: built scalable, user-friendly features that improve operational efficiency and the overall transportation experience\nFleet and contract management: contributed to features for managing logistics contracts and vehicle activity across multiple companies from a single platform\nTracking and reporting: supported real-time vehicle tracking and reporting so stakeholders have transparent, up-to-date information\nFinancial insight: helped integrate financial performance monitoring to connect fleet activity with business results\nPlatform setup and support: configured and troubleshot the domain email setup for delightexpress.co.za, including diagnosing SMTP issues with the hosting provider\n\nSkills demonstrated\n\nFull-stack development, logistics and fleet systems, real-time data and reporting, user-centred design, technical troubleshooting\n\nA couple of quick checks before you publish:\n\nI listed your role as “Software Engineer”. Change it if you had a different title, or add “Scrum Master” if you also ran the agile process on this project.\nThe middle three bullets describe the app’s main features as areas you worked on. If you focused on only some of them, remove the ones you didn’t touch so the entry stays accurate.",
+      "github_url": "git@github.com:LindseyM23/ShuttleD.git",
+      "id": 1,
+      "image": "assets/fallback/media/57937f1b691c815dd2bfae0d9fccbb8a.png",
+      "images": [
+        "assets/fallback/media/57937f1b691c815dd2bfae0d9fccbb8a.png",
+        "assets/fallback/media/99b83de23275516128d823d4d06e9d2a.png",
+        "assets/fallback/media/f49605ae3d4cd4b208ab2dfaff7d1a9e.png",
+        "assets/fallback/media/45d715cfbcb83e18cf9cd3d9c2190dd9.png",
+        "assets/fallback/media/0d8fc4f6f39514b6fa74d3e94e14f346.png",
+        "assets/fallback/media/5289bced45f49a030412e1ae0efbfd75.png",
+        "assets/fallback/media/71608f1516e167de1dad6d7363944efe.png"
+      ],
+      "live_url": "https://delightexpress.co.za",
+      "name": "Delight Express Shuttle App",
+      "order": 0,
+      "technologies": null
+    },
+    {
+      "description": "Aurora Studios Website | Web Design and Digital Services Company Website\nAurora Studios\n\nAbout the project\n\nAurora Studios is a South African web design and digital services company. The website is the studio’s main online presence, showing its services, pricing packages and portfolio to potential clients. It is designed to communicate the brand clearly, build trust with new clients and turn visitors into enquiries through a simple, guided intake process.\n\nMy role\n\nWeb Designer, Developer and Business Development Lead\n\nWhat I contributed\n\nDesign and development: designed and built a modern, responsive website that presents the studio’s brand and services clearly on desktop and mobile\nPricing packages: researched the South African market and designed tiered service packages, presented on the site so clients can easily compare options\nClient intake: created a client intake checklist that captures project requirements upfront, making onboarding faster and more consistent\nContent and positioning: wrote and structured website content to explain services in clear, client-focused language\nBusiness development: used the website as a sales tool to support client outreach and grow the studio’s customer base\n\nSkills demonstrated\n\nWeb design, front-end development, UX and content structure, market research, pricing strategy, business development",
+      "github_url": "git@github.com:LindseyM23/AuroraS.git",
+      "id": 3,
+      "image": "assets/fallback/media/cf63dbf9ab1ec956f997cac6889aae49.png",
+      "images": [
+        "assets/fallback/media/cf63dbf9ab1ec956f997cac6889aae49.png",
+        "assets/fallback/media/94d9734985335972a970696e9b463ce2.png",
+        "assets/fallback/media/75e04008e0d2483deac37786952557a8.png",
+        "assets/fallback/media/fbf8a85ec861f31770b1b27fa81dffa3.png",
+        "assets/fallback/media/f824ccbea9e46a4d332df82f41b6c3a0.png",
+        "assets/fallback/media/ee2c357d3a0b8efcdebde526b79c285d.png",
+        "assets/fallback/media/7eb3f62f94a619bbfef245a693fdab7b.png",
+        "assets/fallback/media/df3db06c9a82f65d2a15365fd29ef8d6.png",
+        "assets/fallback/media/b4c8cf0ce592fce7848f4c6076391f0d.png",
+        "assets/fallback/media/f22491400b2e502c81da861da0cc52df.png"
+      ],
+      "live_url": "https://aurorastudios23.netlify.app/",
+      "name": "Aurora Studios Website",
+      "order": 0,
+      "technologies": null
+    }
+  ],
+  "kpis": [
+    {
+      "description": "Complete an AWS Specialty certification to validate expertise in designing and deploying secure, scalable cloud solutions.",
+      "id": 1,
+      "order": 0,
+      "status": "Planned",
+      "target_date": "2027-04-30",
+      "title": "Achieve AWS Speciality Certification",
+      "visibility": "Public"
+    },
+    {
+      "description": "Complete Scrum Certification",
+      "id": 2,
+      "order": 0,
+      "status": "Planned",
+      "target_date": "2027-04-30",
+      "title": "Scrum Certificate",
+      "visibility": "Public"
+    },
+    {
+      "description": "Successfully design, deploy, and manage three end-to-end cloud-based projects on AWS, demonstrating practical application of cloud skills.",
+      "id": 3,
+      "order": 0,
+      "status": "Planned",
+      "target_date": "2027-04-30",
+      "title": "AWS Cloud-Based Projects",
+      "visibility": "Public"
+    }
+  ],
+  "contact": {
+    "cv_url": "https://acrobat.adobe.com/id/urn:aaid:sc:EU:9e3c78e9-c4d2-4201-af03-12783b9ff2b7",
+    "email": "lindseymonyepao@gmail.com",
+    "github": "https://github.com/LindseyM23",
+    "id": 1,
+    "linkedin": "https://www.linkedin.com/in/lindseym23/",
+    "location": "Johannesburg, Gauteng, South Africa",
+    "phone": "0658263292"
+  }
+}

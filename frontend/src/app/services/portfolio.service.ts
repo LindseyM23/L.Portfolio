@@ -1,9 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, EMPTY, defer, merge, of, throwError, timer } from 'rxjs';
+import { catchError, filter, map, share, takeUntil, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import * as Models from '../models/portfolio.models';
+import { FALLBACK_DATA } from '../data/fallback-data';
+
+/**
+ * If the API hasn't answered after this long (e.g. the host is asleep or the
+ * database is down), show the built-in content straight away. Live data still
+ * replaces it if it arrives later.
+ */
+const FALLBACK_AFTER_MS = 4000;
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +25,41 @@ export class PortfolioService {
   public adminMode$ = this.adminModeSubject.asObservable();
 
   constructor(private http: HttpClient) {}
+
+  // ========== OFFLINE FALLBACK ==========
+
+  /**
+   * Public content requests go through here: on any error — or while the API
+   * is still slow to answer — the visitor sees the bundled snapshot instead
+   * of an empty page. Admins skip the early timeout so they always edit live
+   * data, but still get the fallback if the request fails outright.
+   */
+  private withFallback<T>(live$: Observable<T>, fallback: () => T | undefined): Observable<T> {
+    return defer(() => {
+      let fallbackShown = false;
+      const live = live$.pipe(share());
+      const settled = live.pipe(map(() => true), catchError(() => of(true)));
+
+      const early = this.isAdmin()
+        ? EMPTY
+        : timer(FALLBACK_AFTER_MS).pipe(
+            takeUntil(settled),
+            map(() => fallback()),
+            tap(value => (fallbackShown = value !== undefined))
+          );
+
+      const liveOrFallback = live.pipe(
+        catchError(err => {
+          if (fallbackShown) return EMPTY;          // already showing it
+          const value = fallback();
+          return value === undefined ? throwError(() => err) : of(value);
+        })
+      );
+
+      // undefined = no fallback for this item (e.g. unknown id), so skip it
+      return merge(early, liveOrFallback).pipe(filter((v): v is T => v !== undefined));
+    });
+  }
 
   // ========== AUTH ==========
   
@@ -64,7 +107,7 @@ export class PortfolioService {
   // ========== SOCIAL LINKS ==========
   
   getSocialLinks(): Observable<Models.SocialLink[]> {
-    return this.http.get<Models.SocialLink[]>(`${this.apiUrl}/api/social-links`);
+    return this.withFallback(this.http.get<Models.SocialLink[]>(`${this.apiUrl}/api/social-links`), () => FALLBACK_DATA.socialLinks);
   }
 
   createSocialLink(link: Models.SocialLink): Observable<any> {
@@ -82,7 +125,7 @@ export class PortfolioService {
   // ========== ABOUT ==========
   
   getAbout(): Observable<Models.About> {
-    return this.http.get<Models.About>(`${this.apiUrl}/api/about`);
+    return this.withFallback(this.http.get<Models.About>(`${this.apiUrl}/api/about`), () => FALLBACK_DATA.about);
   }
 
   updateAbout(about: Models.About): Observable<any> {
@@ -92,7 +135,7 @@ export class PortfolioService {
   // ========== SKILLS ==========
   
   getSkills(): Observable<Models.Skill[]> {
-    return this.http.get<Models.Skill[]>(`${this.apiUrl}/api/skills`);
+    return this.withFallback(this.http.get<Models.Skill[]>(`${this.apiUrl}/api/skills`), () => FALLBACK_DATA.skills);
   }
 
   createSkill(skill: Models.Skill): Observable<any> {
@@ -110,7 +153,7 @@ export class PortfolioService {
   // ========== SERVICES ==========
   
   getServices(): Observable<Models.Service[]> {
-    return this.http.get<Models.Service[]>(`${this.apiUrl}/api/services`);
+    return this.withFallback(this.http.get<Models.Service[]>(`${this.apiUrl}/api/services`), () => FALLBACK_DATA.services);
   }
 
   createService(service: Models.Service): Observable<any> {
@@ -128,7 +171,7 @@ export class PortfolioService {
   // ========== CERTIFICATIONS ==========
   
   getCertifications(): Observable<Models.Certification[]> {
-    return this.http.get<Models.Certification[]>(`${this.apiUrl}/api/certifications`);
+    return this.withFallback(this.http.get<Models.Certification[]>(`${this.apiUrl}/api/certifications`), () => FALLBACK_DATA.certifications);
   }
 
   createCertification(cert: Models.Certification): Observable<any> {
@@ -146,11 +189,14 @@ export class PortfolioService {
   // ========== WORK EXPERIENCE ==========
   
   getExperience(): Observable<Models.WorkExperience[]> {
-    return this.http.get<Models.WorkExperience[]>(`${this.apiUrl}/api/experience`);
+    return this.withFallback(this.http.get<Models.WorkExperience[]>(`${this.apiUrl}/api/experience`), () => FALLBACK_DATA.experience);
   }
 
   getExperienceDetail(id: number): Observable<Models.WorkExperience> {
-    return this.http.get<Models.WorkExperience>(`${this.apiUrl}/api/experience/${id}`);
+    return this.withFallback(
+      this.http.get<Models.WorkExperience>(`${this.apiUrl}/api/experience/${id}`),
+      () => FALLBACK_DATA.experience.find(e => e.id === id)
+    );
   }
 
   createExperience(exp: Models.WorkExperience): Observable<any> {
@@ -182,11 +228,14 @@ export class PortfolioService {
   // ========== PROJECTS ==========
   
   getProjects(): Observable<Models.Project[]> {
-    return this.http.get<Models.Project[]>(`${this.apiUrl}/api/projects`);
+    return this.withFallback(this.http.get<Models.Project[]>(`${this.apiUrl}/api/projects`), () => FALLBACK_DATA.projects);
   }
 
   getProject(id: number): Observable<Models.Project> {
-    return this.http.get<Models.Project>(`${this.apiUrl}/api/projects/${id}`);
+    return this.withFallback(
+      this.http.get<Models.Project>(`${this.apiUrl}/api/projects/${id}`),
+      () => FALLBACK_DATA.projects.find(p => p.id === id)
+    );
   }
 
   createProject(project: Models.Project): Observable<any> {
@@ -204,7 +253,7 @@ export class PortfolioService {
   // ========== KPIs ==========
   
   getKPIs(): Observable<Models.KPI[]> {
-    return this.http.get<Models.KPI[]>(`${this.apiUrl}/api/kpis`);
+    return this.withFallback(this.http.get<Models.KPI[]>(`${this.apiUrl}/api/kpis`), () => FALLBACK_DATA.kpis);
   }
 
   getAllKPIs(): Observable<Models.KPI[]> {
@@ -226,7 +275,7 @@ export class PortfolioService {
   // ========== CONTACT ==========
   
   getContact(): Observable<Models.Contact> {
-    return this.http.get<Models.Contact>(`${this.apiUrl}/api/contact`);
+    return this.withFallback(this.http.get<Models.Contact>(`${this.apiUrl}/api/contact`), () => FALLBACK_DATA.contact);
   }
 
   updateContact(contact: Models.Contact): Observable<any> {
