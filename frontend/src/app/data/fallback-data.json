@@ -253,26 +253,26 @@
       "technologies": null
     },
     {
-      "id": 4,
-      "name": "J.C Sambo Attorneys Website",
-      "live_url": "https://jcsambo.netlify.app/",
-      "github_url": "git@github.com:LindseyM23/J.CSambo-website.git",
-      "technologies": "React, Vite, React Router, Netlify",
       "description": "J.C Sambo Attorneys Website | Law Firm Website and Client Enquiry Platform\nJ.C Sambo Attorneys Inc.\n\nAbout the project\n\nJ.C Sambo Attorneys Inc. is a South African law firm with offices in Polokwane and Nelspruit. The website is the firm’s main online presence, presenting its practice areas, values and contact details to people looking for legal help. It is designed to feel trustworthy and approachable, explain the law in plain language and make it easy for clients to get in touch, including for urgent matters such as arrests over weekends.\n\nMy role\n\nWeb Designer and Front-End Developer\n\nWhat I contributed\n\nDesign and branding: designed a refined, editorial look with a warm bronze palette, classical imagery and elegant typography that reflects the firm’s professionalism and its promise of “Your Attorney. Your Ally.”\nFront-end development: built a fast, responsive single-page site in React with Vite and React Router, covering Home, About Us, What We Do and Contact pages\nPractice areas: structured 14 areas of law into 4 disciplines, with a filterable practice index and detailed descriptions so visitors can quickly find the help they need\nContent and messaging: wrote and organised client-focused content, including the firm’s story, values (integrity, confidentiality, accountability and transparency) and community commitment\nClient enquiries: built a contact page with telephone, office details and an enquiry form that sends matters directly to the firm, with clear guidance for urgent cases\nSEO and deployment: added search and social sharing metadata and deployed the site on Netlify\n\nSkills demonstrated\n\nWeb design, React front-end development, responsive layout, UX and content structure, copywriting, SEO, deployment",
-      "image": "assets/fallback/media/jcsambo-01.jpg",
+      "github_url": "git@github.com:LindseyM23/J.CSambo-website.git",
+      "id": 4,
+      "image": "assets/fallback/media/b964666d9c714592e234cccf18c9f4fb.jpg",
       "images": [
-        "assets/fallback/media/jcsambo-01.jpg",
-        "assets/fallback/media/jcsambo-02.jpg",
-        "assets/fallback/media/jcsambo-03.jpg",
-        "assets/fallback/media/jcsambo-04.jpg",
-        "assets/fallback/media/jcsambo-05.jpg",
-        "assets/fallback/media/jcsambo-06.jpg",
-        "assets/fallback/media/jcsambo-07.jpg",
-        "assets/fallback/media/jcsambo-08.jpg",
-        "assets/fallback/media/jcsambo-09.jpg",
-        "assets/fallback/media/jcsambo-10.jpg"
+        "assets/fallback/media/b964666d9c714592e234cccf18c9f4fb.jpg",
+        "assets/fallback/media/f0560e1e34da9d0d1e0070499134c7e7.jpg",
+        "assets/fallback/media/dfe0c8411dd47bb88d68dc8c2d07ed33.jpg",
+        "assets/fallback/media/90ceb0924c8a3478adbdf388b6d4f98d.jpg",
+        "assets/fallback/media/d20b4fdcae27cff3fe921ee35b76b627.jpg",
+        "assets/fallback/media/208c2beafb749cf24d658b46fdddb26c.jpg",
+        "assets/fallback/media/aa3602956e2e5ee03ce5f1bde9c142e7.jpg",
+        "assets/fallback/media/50ff21008b5493f1fd8e383e57003707.jpg",
+        "assets/fallback/media/59e3d450afc99ddfd7ea4e58383ff8da.jpg",
+        "assets/fallback/media/06b9803b07558bd2a41ec36b6ac18e52.jpg"
       ],
-      "order": 2
+      "live_url": "https://jcsambo.netlify.app/",
+      "name": "J.C Sambo Attorneys Website",
+      "order": 2,
+      "technologies": "React, Vite, React Router, Netlify"
     },
     {
       "description": "BlinkHub | AI-Integrated Vendor Management and Procurement Platform\nProcureSense\n\nAbout the project\n\nBlinkHub is a cloud-based vendor management and procurement platform that helps organisations find, onboard and manage suppliers in one place. It connects clients and vendors through dedicated portals, streamlines procurement workflows and uses AI-assisted features to support smarter, faster and more compliant purchasing decisions.\n\nMy role\n\nJunior Software Engineer, Scrum Master and Product Documentation Lead\n\nWhat I contributed\n\nDevelopment: built and maintained front-end and back-end components, implemented features that improved system performance and user experience, and worked with senior developers on scalable, maintainable code and cloud integration\nAgile delivery: facilitated all Scrum ceremonies for the team, managed backlog refinement with stakeholders, removed blockers and tracked sprint progress to keep releases on schedule\nTraining and documentation: wrote and structured comprehensive client and vendor training manuals covering all major platform modules, with clear step-by-step navigation and functional feature descriptions\nDocumentation pipeline: designed a process to keep documentation current with a fast-changing feature set, including a developer submission template, an approval workflow and a standard feature documentation template\nProduct and stakeholder support: wrote product demo scripts and client and partner correspondence\n\nSkills demonstrated\n\nFull-stack development, cloud integration, Scrum and Kanban facilitation, technical writing, process design, stakeholder communication",
