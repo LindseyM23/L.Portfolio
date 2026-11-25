@@ -12,6 +12,8 @@ export class MediaUrlPipe implements PipeTransform {
   transform(path: string | null | undefined): string {
     if (!path) return '';
     if (/^(https?:|data:|blob:)/i.test(path)) return path;
+    // Bundled copies used by the offline fallback content
+    if (/^\/?assets\//.test(path)) return path.replace(/^\//, '');
     return `${environment.apiUrl}${path.startsWith('/') ? '' : '/'}${path}`;
   }
 }
